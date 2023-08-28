@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 /* output histogram based on word count */
 
@@ -48,8 +49,16 @@ double main()
         }
         else
         {
-            INWORD = YES; /*if we're inside a word, kep cunting chars*/
-            ++nc;
+            INWORD = YES; /*if we're inside a word, keep counting chars*/
+            if (nc < 98)
+            {
+                ++nc;
+            }
+            else /*wordcount[100] allows wordlengths up to 100 characters. Do not allow someone to get near this limit and write outside the program for security reasons*/
+            {
+                printf("HARDENED MEMORY ALLOCATOR ON THE FIRST CHAPTER OF THE BOOK!!!!");
+                exit(0);
+            }
         }
     }
     for (j = maxwords; j > 0; --j)
