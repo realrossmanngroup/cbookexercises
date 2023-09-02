@@ -10,21 +10,21 @@ double main()
     int charcount[1000]; /*Array counting number of times an ascii character has been used */
 
     int maxascii; /*highest ascii character count*/
-    maxascii = 0;
+    maxascii = 0; /* set ascii character to 0 in beginning*/
 
     for (i = 0; i < 1000; ++i) /*Set all counts of charcounts to 0*/
     {
         charcount[i] = 0;
     }
 
-    while ((c = getchar()) != EOF)
+    while ((c = getchar()) != EOF) /*get input from keyboard*/
     {
-        if (c < 998)
+        if (c < 998) /* only allow program to work when c is within safe limit, less than the 1000 the array was allowed*/
         {
-            ++charcount[c];
-            if (maxascii < c)
+            ++charcount[c]; /* add to charcount of a character everytime it is typed*/
+            if (maxascii < c) 
             {
-                maxascii = c;
+                maxascii = c; /* set maxascii for histogram's end each time c is a higher ascii value than what was used before */
             }
         }
 
@@ -37,10 +37,10 @@ double main()
     }
     for (j = 1; j <= maxascii; j++) /*print charcount*/
     {
-        printf("\n%3c ", j);
+        printf("\n%c ", j);
         for (k = 0; k < charcount[j]; k++)
         {
-            printf("|"); /*print number of words visually of each charcount*/
+            printf("|"); /*print number of times each character was used visually with pipes*/
         }
     }
     printf("\n\nThe highest ASCII character was the character \"%c\" ", maxascii);
