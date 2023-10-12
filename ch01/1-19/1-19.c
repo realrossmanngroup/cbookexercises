@@ -1,27 +1,31 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 #define MAXLINE 1000 /* maximum input line size */
 
 int get_line(char line[], int maxline);
 void copy(char to[], char from[]);
-int reverse(char s[], int arraylength);
-int arraylength;
+char *reverse(char c[], int sizeofarray);
 
-/* reverse(s), this function is supposed to reverse a character array so a statement entered is backwards */
-
-reverse(char s[], int arraylength)
+/* reverse a character array*/
+char *reverse(char b[], int sizeofarray)
 {
-    int i, j;
-    char t[arraylength];
-    for (i = 0; i <= arraylength; i++)
+    int g, h; /*variables for loop. One will count down, one will count up.*/
+    char *t = (char *)malloc(sizeofarray * sizeof(char));
+    for (g = 0, h = sizeofarray - 2; g <= sizeofarray - 2, h >= 0; g++, h--) /*Set loop to count g up and h down; g up from 0, and h down from the end of the array */
     {
-
-        for (j = arraylength; i >= 0; j--)
+        if (b[g] != '\0') /*Only copy stuff over if it isn't null terminated - I don't want to put the null terminator at the beginning of my new character array!*/
         {
-
-            s[i] = s[j];
+            t[h] = b[g];                                               /*set last character of new array as equal to first character of old array, and keep going until loop ends*/
+            printf("%c is b[%d] and %c is t[%d]\n", b[g], g, t[h], h); /*print what's going on for debugging purposes*/
+        }
+        else
+        {
+            t[sizeofarray - 1] = '\0'; /*when we DO get to a null terminator(end of first character array), make sure to put a null terminator on the END of the new char array*/
         }
     }
-    return s;
+    return t;
 }
 
 /* get_line: read a line into s, return length */
@@ -32,13 +36,13 @@ int get_line(char s[], int lim)
     {
         s[i] = c;
     }
-    reverse(s, sizeof(s) / sizeof(s[0])); /*this is supposed to reverse the s array so the text is stored backwards*/
     if (c == '\n')
     {
         s[i] = c;
         ++i;
     }
     s[i] = '\0';
+    printf("%s\n", reverse(s, sizeof(s) / sizeof(s[0])));
     return i;
 }
 
@@ -69,10 +73,13 @@ int main()
             copy(longest, line);
         }
     }
-    if (max > 0)
-    { /* there was a line */
-        printf("%s", longest);
-        printf("The longest line was %d characters long.\n", max);
+    if (max > 0) /* Only print the line if it's over 0 characters*/
+    {            /* there was a line */
+        printf("%s", reverse(longest, sizeof(longest) / sizeof(longest[0])));
+    }
+    else
+    {
+        printf("The line was too short to print, sorry bro\n");
     }
     return 0;
 }
