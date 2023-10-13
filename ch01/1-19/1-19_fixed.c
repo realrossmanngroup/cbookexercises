@@ -42,7 +42,7 @@ int get_line(char s[], int lim)
         ++i;
     }
     s[i] = '\0';
-    printf("%s\n", reverse(s, i +1));
+    printf("%s\n", reverse(s, i + 1));
     return i;
 }
 

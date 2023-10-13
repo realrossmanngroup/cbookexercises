@@ -10,7 +10,7 @@ int get_line(char s[], int lim)
     int c, i;
     for (i = 0; i < lim - 1 && (c = getchar()) != EOF && c != '\n'; i++)
     {
-        if (c != ' ') /*Only add characters to s array if it's not a blank.*/
+        if (c != ' ' && c != '\t') /*Only add characters to s array if it's not a blank or a tab.*/
         {
             s[i] = c;
         }
