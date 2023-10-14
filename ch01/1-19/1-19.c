@@ -15,7 +15,7 @@ char *reverse(char b[], int sizeofarray)
     char *t = (char *)malloc(sizeofarray * sizeof(char));
     for (g = 0, h = sizeofarray - 2; g <= sizeofarray - 2, h >= 0; g++, h--) /*Set loop to count g up and h down; g up from 0, and h down from the end of the array */
     {
-        if (b[g] != '\0') /*Only copy stuff over if it isn't null terminated - I don't want to put the null terminator at the beginning of my new character array!*/
+        if (b[g] != '\0') /*Only copy stuff over if it isn't null terminated - I don't want to put the ntesull terminator at the beginning of my new character array!*/
         {
             t[h] = b[g];                                               /*set last character of new array as equal to first character of old array, and keep going until loop ends*/
             printf("%c is b[%d] and %c is t[%d]\n", b[g], g, t[h], h); /*print what's going on for debugging purposes*/
