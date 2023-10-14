@@ -18,7 +18,7 @@ char *reverse(char b[], int sizeofarray)
         if (b[g] != '\0') /*Only copy stuff over if it isn't null terminated - I don't want to put the null terminator at the beginning of my new character array!*/
         {
             t[h] = b[g];                                               /*set last character of new array as equal to first character of old array, and keep going until loop ends*/
-            printf("%c is b[%d] and %c is t[%d]\n", b[g], g, t[h], h); /*print what's going on for debugging purposes*/
+          /*  printf("%c is b[%d] and %c is t[%d]\n", b[g], g, t[h], h); /*print what's going on for debugging purposes */
         }
         else
         {
