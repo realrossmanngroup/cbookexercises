@@ -35,22 +35,20 @@ int main()
         {
             if (s[startfromhere] == ' ' || s[startfromhere] == '\t')
             {
+                choppoint = startfromhere;
                 printf("line %d code ran, %d is startfromhere, %d is choppoint, %d is beginning \n", __LINE__, startfromhere, choppoint, beginning);
                 /* debug code only */
             }
             else
             {
-                choppoint = startfromhere - 1;
                 printf("line %d code ran\n", __LINE__); /* testing debug code*/
-                /* THIS IS WRITTEN IN PSUEDOCODE FOR MY BENEFIT, DON'T ACTUALLY TRY TO COMPILE THIS GARBAGE!!!*/
-                for (l = 0, k = beginning; l <= choppoint - beginning, k <= choppoint; l++, k++)
+                for (l = 0, k = beginning; l <= choppoint, k <= choppoint; l++, k++)
                 {
                     chopped[l] = s[k];
-                    printf("line %d code ran\n", __LINE__);
+                    printf("line %d ran, chopped[l %d] is %c and s[k %d] is %c\n", __LINE__, l, chopped[l], k, s[k]);
                 }
                 printf("%s\n", chopped); /* print all the text from that to that */
                 beginning = choppoint;
-                startfromhere = choppoint;
             }
         }
         startfromhere++;
