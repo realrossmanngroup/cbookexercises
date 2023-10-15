@@ -10,8 +10,6 @@ int main()
     int endpretruncate;         /*end of line, go back to here, this stays on line 1 when word wrapped*/
     int line2nullterminatorpos; /*where the null terminator goes on line 2*/
     int c, i, j, k, l;          /*for for loop*/
-    int startfromhere, beginning;
-    int choppoint;            /*where we are cutting the line*/
     char s[MAXLINE];          /*store what we typed*/
     char line1array[MAXLINE]; /*store line 1*/
     char line2array[MAXLINE]; /*store line 2*/
