@@ -34,7 +34,7 @@ void *reverse(char b[])
     also, the null terminator has to be at the end, so in reality this array is 4 characters. t, h, e, and '\0'. So if I use j + 2 I get the proper size. */
 
     /* Set loop to count g up and h down; g up from 0, and h down from the end of the array */    
-    for (g = 0, h = sizeofarray - 2; g <= sizeofarray - 2, h >= 0; g++, h--) /
+    for (g = 0, h = sizeofarray - 2; g <= sizeofarray - 2, h >= 0; g++, h--)
     {
         if (b[g] != '\0') 
         /*Only copy stuff over if it isn't null terminated. Copying the null terminator over would be a fail. Null terminator marks 
@@ -101,7 +101,7 @@ int main()
     if (max > 0) /* Only print the line if it's over 0 characters*/
     {            /* there was a line */
         reverse(longest);
-        printf("%s\n", reversedversion);
+        printf("%s\n\n", reversedversion);
     }
     else
     {
