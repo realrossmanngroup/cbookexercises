@@ -5,7 +5,6 @@
 
 int main()
 {
-    int howfarin;               /*store where I am the in line*/
     int endposttruncate;        /*end of line, go back from here, this part will go onto the next line with word wrap*/
     int endpretruncate;         /*end of line, go back to here, this stays on line 1 when word wrapped*/
     int line2nullterminatorpos; /*where the null terminator goes on line 2*/
@@ -15,11 +14,10 @@ int main()
     char line2array[MAXLINE];   /*grab what's after endpretruncate and before endposttruncate on s[MAXLINE], which is what I typed,
     and store it here to be placed on line 2 for */
 
-    howfarin = endposttruncate = endpretruncate = line2nullterminatorpos = c = i = j = k = l = 0;
+    endposttruncate = endpretruncate = line2nullterminatorpos = c = i = j = k = l = 0;
 
     for (i = 0; i < MAXLINE - 1 && (c = getchar()) != EOF && c != '\n'; i++) /* get text as long as it's smaller than MAXLINE*/
     {
-        howfarin++;
         endpretruncate++; /*make sure this follows up as we type forward*/
         s[i] = c;         /*store text as char array*/
     }
