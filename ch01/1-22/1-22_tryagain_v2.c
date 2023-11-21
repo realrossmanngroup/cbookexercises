@@ -22,7 +22,7 @@ int main()
         s[i] = c;         /*store text as char array*/
     }
 
-    if (i > LINELENGTH) /*Once we are further than the specified line length into our typed line, find*/
+    if (i > LINELENGTH) /*Once we are further than the specified line length into our typed line, find our first cut point*/
     {
         endposttruncate = i;
         i = LINELENGTH;
@@ -37,11 +37,12 @@ int main()
             }
         }
     }
-
-    for (l = 0; l <= MAXLINE; l++)
-    { /*ERASE LINE1ARRAY BEFORE USING IT!*/
+    // ERASE LINE1ARRAY BEFORE USING IT! //
+    /* for (l = 0; l <= MAXLINE; l++)
+    {
         line1array[l] = ' ';
-    }
+        } */
+
     for (j = 0; j <= endpretruncate + 1; j++) /*set line 1 to what we typed, up until the first cut point*/
     {                                         /*add truncated line to array for line 1*/
         line1array[j] = s[j];                 /* define line1array as a character array being what we typed(s[j]), with J ending at first cutpoint)*/
@@ -51,10 +52,10 @@ int main()
     printf("%s\n", line1array);        /* print line 1, truncated*/
 
     /*create the character array from line 2 by taking the excess text between endpretruncate  and endpostruncate(cut points) from our character array of typed text, s[]*/
-    for (l = 0, k = endpretruncate; l <= endposttruncate - endpretruncate, k <= endposttruncate; l++, k++)
+    for (l = 0, k = endpretruncate; l <= endposttruncate - endpretruncate && k <= endposttruncate; l++, k++)
     {
         line2array[l] = s[k];
-        /* printf("line %d code, line2array[%d] is %c, s[%d] is %c, endpretruncate is %d, endposttruncate is %d\n", __LINE__, l, line2array[l], k, s[k], endpretruncate, endposttruncate); */ /* DEBUG CODE */
+        printf("line %d code, line2array[%d] is %c, s[%d] is %c, endpretruncate is %d, endposttruncate is %d\n", __LINE__, l, line2array[l], k, s[k], endpretruncate, endposttruncate); /* DEBUG CODE */
     }
     line2array[l] = '\0';
     printf("%s\n", line2array);
