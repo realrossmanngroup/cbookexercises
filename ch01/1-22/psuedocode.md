@@ -12,3 +12,15 @@
 12) get size of line1array, add 1 to it, and subtract it from linelength. define howfarin as equal to this. 
 13) go back to step 3, and pray for the love of god that this actually works
 
+-------------------
+The one above doesn't have it in a function.
+
+1) Get the line, assign it to char array, and figure out how long it is 
+2) While the line is greater than linelength, run a function that 
+----MAKE THIS INTO A FUNCTION
+
+a) cuts the line to the longest thing that is under linelength
+b) takes the line from the cut point, and rewrites that to a new character array
+c) empties the original character array
+d) copies the new character array to the original array 
+---^^^

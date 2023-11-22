@@ -4,7 +4,7 @@
 #define LINELENGTH 60 /*how long before we cut off the line?*/
 
 char *wordwrap(char b[]); /*function that will print one line wrapped and shrink character array down to be everything that was not wrapped*/
-char s[MAXLINE];     /*this character array stores what we type as a global variable so it doesn't get fucked up when messing with it inside/outside of a function*/
+char s[MAXLINE];          /*this character array stores what we type as a global variable so it doesn't get fucked up when messing with it inside/outside of a function*/
 
 int main()
 {
@@ -15,28 +15,41 @@ int main()
 
     for (i = 0; i < MAXLINE - 1 && (c = getchar()) != EOF && c != '\n'; i++) /* get text as long as it's smaller than MAXLINE*/
     {
-        endofinput++; /*make sure this follows up as we type forward*/
-        s[i] = c;     /*store text as char array*/
+        s[i] = c;                                        /*store text as char array*/
+        printf("this is s[%d]: %c\n\n", i, s[i]);        /*for debugging*/
+        endofinput++;                                    /*make sure this follows up as we type forward*/
+        printf("this is endofinput %d\n\n", endofinput); /*debug line*/
     }
-
     /*place a null terminator at the end of the input*/
-    s[endofinput + 1] = '\0';
+    s[endofinput] = '\0';
+
+    printf("this is char array s: %s\n\n", s); /*this is for debugging*/
+
+    /*this is for debugging*/
+    for (i = 0; i <= endofinput + 1; i++)
+    {
+        printf("this is s[%d] %c\n", i, s[i]);
+        if (s[i] == '\0'){
+            printf("s[%d] is a null terminator!\n",i);
+        }
+    }
 
     while ((sizeof(s) / sizeof(s[0])) > LINELENGTH) /*as long as the character array is longer than the size of a line, run the code below*/
     {
         /*put code here that does the following:
-
         1) Run function that takes char array
         This function should
         a) count backwards from s[LINELENGTH] to find a blank
         b) find the blank
         c) set that number as a variable called wheretowrap.
-        d) print the char array from s[0] to s[wheretowrap]
-        e) take from s[wheretowrap] to s[i] and put this into a new character array called truncated[]
-        f) erase s[]
-        g) take truncated[] and put it into s[] */
+    d) take s[0] to s[wheretowrap] and put this into a char array called w1, which will be the first line.
+        d) print w1, our first line, which will fit.
+        e) take from s[wheretowrap] to the end of s[] (everything from s[wheretowrap] to the null terminator at the end of s and put this into a new character array called w2[]
+        f) erase s[]    
+        g) take w2[] and put it into s[] */
 
         wordwrap(s);
+        printf("is this what is repeating, first while loop?\n\n"); /*for debugging*/
     }
 
     /* 2) After while loop, print whatever is left in s[], as it will be the last line less than the linelength */
@@ -53,25 +66,29 @@ char *wordwrap(char b[])
 
     /*x will be initialized at LINELENGTH, which is the maximum length a single line can be*/
     x = LINELENGTH;
-    /*find where the character array of typed text needs to be cut so we have the maximum amount of full words that fit on one line*/
+    /*start at the end of line 1 of my character array and go backwards to find a blank or a tab I can use as a cut point.
+    I can't cut in the middle of a word, I have to cut at a blank or a tab if I am going to wrap properly to the next line*/
 
-    while (b[x] != EOF) /*count backwards from the end of the line*/
+
+    while (b[x] != ' ')
     {
-        x--;                             /* count backwards*/
-        if (b[x] == ' ' || b[x] == '\t') /*if it's a blank or a tab*/
-        {
-            wheretowrap = x + 1; /*set the START point for our cut, to the point that is a tab or a blank*/
-                                 /* printf("line %d says that we set endpretruncate %d equal to s[%d] %c\n", __LINE__, endpretruncate, i, s[i]); DEBUG CODE*/
-            break;               /*since a while loop will keep going and set endpretruncate to the first i in the line, i want to END this part of the program the moment we find the first blank or tab*/
-        }
+        /*count backwards from the end of the line, x is end of the line(linelength)*/
+        printf("is this what is repeating? while loop inside function\n\n"); /*for debugging*/
+        printf("this is b[%d]: %c a character in the array b inside the function\n\n",x, b[x]); /*for debugging*/
+        printf("this is array b inside the function: %s\n\n",b);
+        printf("this is s[%d]: %c is a character in the array s inside the function, this is what we captured user input to\n\n",x, s[x]); /*for debugging*/
+        printf("this is array s inside the function: %s\n\n",s);
+        x--;
+        wheretowrap = x - 1;
     }
+
     /*make a new character array with the first line*/
     for (y = 0; y <= wheretowrap; y++)
     {
         w1[y] = b[y];
     }
     /*add a null terminator to the end of the first line character array*/
-    w1[wheretowrap + 1] = '\0';
+    w1[wheretowrap] = '\0';
     printf("%s\n", w1);
 
     /*fill up w2 character array, which is everything after line 1, with everything that you did not print in line 1.*/
@@ -101,4 +118,3 @@ char *wordwrap(char b[])
 
     s[wheretoputnullterminatoronw2 + 1] = '\0';
 }
-
