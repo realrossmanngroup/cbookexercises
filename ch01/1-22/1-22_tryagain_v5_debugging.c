@@ -26,7 +26,6 @@ int main()
 
     /*test whether it actually captured my input*/
     printf("this is my input after my capture to char array s is done: %s\n\n", s); /*this line is for debugging*/
-
     while ((sizeof(s) / sizeof(s[0])) > LINELENGTH) /*as long as the character array is longer than the size of a line, run the code below*/
     {
         /*put code here that does the following:
