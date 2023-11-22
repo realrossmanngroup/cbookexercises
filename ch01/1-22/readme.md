@@ -1,4 +1,7 @@
+1-22_completed_exercise.c is the completed exercise, fully working. 
+
 psuedocode.md documents what I wanted the program to do, in plain English. I went through three iterations of psuedocode before I got it to work. 
+
 
 This was hard. I was stuck on this for almost two months and gave up for days at a time doing any work at all. If I had half a brain or any sense of dignity I'd pretend I got it right the first time and clean up the garbage files. But, I don't want to do that. I want to look back on this someday and laugh when I am a much better programmer.
 
