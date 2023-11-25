@@ -122,7 +122,7 @@ void main()
 
     // PRINT THE C PROGRAM LOADED INTO THE PROGRAM, WITH COMMENTS
 
-    printf("\n########!!!!!!$$$$$$%%%%%%^^^^^^&&&&&&******(((())))______++++++@@@@@@\nTHIS IS THE COMMENTED, UNPROCESSED VERSION OF THE PROGRAM!\n########!!!!!!$$$$$$%%%%%%^^^^^^&&&&&&******(((())))______++++++@@@@@@\n\n");
+    printf("\nTHIS IS THE COMMENTED, UNPROCESSED VERSION OF THE PROGRAM!\n\n");
     for (int x = 0; x < linewereon; x++) /*this prints the file I loaded into my string array just to make sure I stored it properly*/
     {
 
@@ -239,7 +239,7 @@ void main()
 
     // PRINT THE C PROGRAM PROCESSED BY THE PROGRAM, WITHOUT COMMENTS
 
-    printf("\n########!!!!!!$$$$$$%%%%%%^^^^^^&&&&&&******(((())))______++++++@@@@@@\nTHIS IS THE UN-COMMENTED, PROCESSED VERSION OF THE PROGRAM!\n########!!!!!!$$$$$$%%%%%%^^^^^^&&&&&&******(((())))______++++++@@@@@@\n\n");
+    printf("\nTHIS IS THE UN-COMMENTED, PROCESSED VERSION OF THE PROGRAM!\n\n");
 
     for (int x = 0; x < linewereon; x++) /*this prints the processed output without comments*/
     {
