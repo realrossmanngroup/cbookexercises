@@ -11,12 +11,12 @@ I wanted to make sure I had it down for a single character array. That is what I
 void main()
 {
 
-  int w; /*used to keep track of where we are - IN or OUT of a comment? */
-  w = 0;
-  int x; /*use in for loop to count up in the nocomments array. this goes up when there are no comments */
-  x = 0; /*declare x as 0*/
-  int y; /*use in for loop to count up in the comments array - this goes up when there are no comments, and when there are comments*/
-  y = 0; /*declare y as 0*/
+  int w;   /*used to keep track of where we are - IN or OUT of a comment? */
+  w = OUT; /*start as out of a comment*/
+  int x;   /*use in for loop to count up in the nocomments array. this goes up when there are no comments */
+  x = 0;   /*declare x as 0*/
+  int y;   /*use in for loop to count up in the comments array - this goes up when there are no comments, and when there are comments*/
+  y = 0;   /*declare y as 0*/
 
   char nocomment[MAXLINELENGTH]; /*this is where I am storing the uncommented line after processing - just for debugging*/
   char comment[MAXLINELENGTH];   /*this is where I am storing the commented line before processing - just for debugging*/

@@ -85,10 +85,10 @@ void main()
 
   // REMOVE COMMENTS FROM THE FILE LOADED INTO THE MULTI STRING ARRAY comment[][] AND MOVE IT TO char nocomment[][]
 
-  for (int a = 0; a <= linewereon; a++)
+  for (int a = 0; a <= linewereon; a++, x = 0, y = 0)
   {
 
-    if (w = OUT)
+    if (w == OUT)
     { /*if we out of a comment, do the following*/
 
       /*write the logic for not iterating upwards when a /* is seen until a */ // is seen.
@@ -99,7 +99,7 @@ void main()
         {          /*if we do not see the first part of a comment, copy the commented array to the non-commented array directly*/
           w = OUT; /*we are OUT of a comment*/
           nocomment[a][x] = comment[a][y];
-          printf("DEBUGOUTPUT nocomment[%d][%d] is %c, comment[%d][%d] is %c\n\n", a, x, nocomment[a][x], a, y, comment[a][y]); /*FOR DEBUGGING*/
+          printf("DEBUGOUTPUT w is %d nocomment[%d][%d] is %c, comment[%d][%d] is %c\n\n",w, a, x, nocomment[a][x], a, y, comment[a][y]); /*FOR DEBUGGING*/
           x++;
           y++;
         }
@@ -139,7 +139,7 @@ void main()
 
   for (int x = 0; x < linewereon; x++) /*this prints the processed output without comments*/
   {
-    printf("DEBUGOUTPUT linewereon is %d, x is %d from nocomment[%d] which is %s\n\n", linewereon, x, x, nocomment[x]); /*FOR DEBUGGING*/
+    // printf("DEBUGOUTPUT linewereon is %d, x is %d from nocomment[%d] which is %s\n\n", linewereon, x, x, nocomment[x]); /*FOR DEBUGGING*/
     printf("%s", nocomment[x]);
   } /*print the processed, uncommented program */
 

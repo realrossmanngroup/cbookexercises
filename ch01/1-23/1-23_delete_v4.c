@@ -19,6 +19,8 @@ void main()
   y = 0;                                   /*declare y as 0*/
   int linewereon;                          /* keep track of what line we are on in our string array while copying input file to it*/
   linewereon = 0;                          /*initialize linewereon at 0*/
+  int wheretoplacenullterminator;          /*where to place null terminator as we copy each line*/
+  wheretoplacenullterminator = 0;          /*initialize to 0*/
   int linelength;                          /*how long each line I am taking from my file is*/
   linelength = 0;                          /*initialize at 0 */
   char filename[MAXFILENAME];              /* this will be where we store the name of our filename */
@@ -68,6 +70,18 @@ void main()
     for (int x = 0; x <= linelength; x++) /*copy the contents of each line of the file over to a line in our string array*/
     {
       comment[linewereon][x] = filetempcontents[x];
+      wheretoplacenullterminator = x;
+    }
+    printf("FOR DEBUG comment[%d][%d] is %c\n", linewereon, wheretoplacenullterminator, comment[linewereon][wheretoplacenullterminator]); /*for debugging*/
+    comment[linewereon][wheretoplacenullterminator] = '\0';                                                                               /*place null terminator at the end of each line*/
+    printf("DEBUGOUTPUT we placed a null terminator on comment[%d][%d]\n", linewereon, wheretoplacenullterminator);                       /*for debugging*/
+    if (comment[linewereon][wheretoplacenullterminator] == '\0')
+    {
+      printf("DEBUGOUTPUT this CONFIRMS We placed a null terminator on comment[%d][%d]\n", linewereon, wheretoplacenullterminator);
+    }
+    else
+    {
+      printf(" we did not place a null terminator there, it failed !\n ");
     }
     linewereon++; /* each time the while loop loops we're on a new line, so iterate the line we're on in the string array */
   }
@@ -76,6 +90,7 @@ void main()
 
   for (int x = 0; x < linewereon; x++) /*this prints the file I loaded into my string array just to make sure I stored it properly*/
   {
+
     printf("%s", comment[x]);
   } /*print the program */
 
@@ -85,32 +100,41 @@ void main()
 
   // REMOVE COMMENTS FROM THE FILE LOADED INTO THE MULTI STRING ARRAY comment[][] AND MOVE IT TO char nocomment[][]
 
-  for (int a = 0; a <= linewereon; a++)
+  for (int a = 0; a <= linewereon; a++, x = 0, y = 0)
   {
 
-    if (w = OUT)
+    if (w == OUT)
     { /*if we out of a comment, do the following*/
 
       /*write the logic for not iterating upwards when a /* is seen until a */ // is seen.
-      while (comment[a][y] != '\0' && y < MAXLINELENGTH - 1)
+      while ((comment[a][y] != '\0') && (y < MAXLINELENGTH - 1))
       {
-        w = OUT;
-        if (comment[a][y] != '/' && comment[a][y + 1] != '*')
+        if ((comment[a][y] != '/') && (comment[a][y + 1] != '*'))
         {          /*if we do not see the first part of a comment, copy the commented array to the non-commented array directly*/
           w = OUT; /*we are OUT of a comment*/
           nocomment[a][x] = comment[a][y];
-          printf("DEBUGOUTPUT nocomment[%d][%d] is %c, comment[%d][%d] is %c\n\n", a, x, nocomment[a][x], a, y, comment[a][y]); /*FOR DEBUGGING*/
+          printf("DEBUGOUTPUT notincomment nocomment[%d][%d] is %c, comment[%d][%d] is %c\n", a, x, nocomment[a][x], a, y, comment[a][y]); /*FOR DEBUGGING*/
+          if (comment[a][y] == '\0')
+          {
+            printf("DEBUGOUTPUT comment[%d][%d] is a null terminator!\n", a, y);
+          }
+          else
+          {
+            printf("DEBUGOUTPUT comment[%d][%d] is NOT a null terminator!\n", a, y);
+          } /*for debugging*/
           x++;
           y++;
         }
         else /*if we DO see a comment, iterate the commented array up*/
         {
-          y = y + 2;                                                                        /*move past the two characters that begin the comment*/
-          w = IN;                                                                           /*we are IN a comment*/
-          while (comment[a][y] != '*' && comment[a][y + 1] != '/' && y < MAXLINELENGTH - 1) /*this runs until we see the characters that end the comment*/
+          y = y + 2;                                                                                                                                            /*move past the two characters that begin the comment*/
+          w = IN;                                                                                                                                               /*we are IN a comment*/
+          while (((comment[a][y] != '*') || (comment[a][y + 1] != '/')) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*this runs until we see the characters that end the comment*/
           {
-            y++;                                                  /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
-            if (comment[a][y] == '*' && comment[a][y + 1] == '/') /*Look out for the two characters that end the comment block!*/
+            printf("DEBUGOUTPUT incomment nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*FOR DEBUGGING*/
+
+            y++;                                                      /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
+            if ((comment[a][y] == '*') && (comment[a][y + 1] == '/')) /*Look out for the two characters that end the comment block!*/
             {
               y = y + 2; /* add 2 to y so that we skip over it in the commented array!*/
               w = OUT;   /*we are OUT of a comment again*/
@@ -124,14 +148,43 @@ void main()
     {                                                                                   /*if W = IN, we are in a comment as we enter a new line:*/
       while (comment[a][y] != '*' && comment[a][y + 1] != '/' && y < MAXLINELENGTH - 1) /*this runs until we see the characters that end the comment*/
       {
-        y++;                                                  /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
-        if (comment[a][y] == '*' && comment[a][y + 1] == '/') /*Look out for the two characters that end the comment block!*/
+        printf("DEBUGOUTPUT incomment nocomment[%d][%d] is %c, comment[%d][%d] is %c and comment[%d][%d] is  %c\n", a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*FOR DEBUGGING*/
+        y++;                                                                                                                                                                                  /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
+        if (comment[a][y] == '*' && comment[a][y + 1] == '/')                                                                                                                                 /*Look out for the two characters that end the comment block!*/
         {
+          printf("DEBUGOUTPUT leavingcomment nocomment[%d][%d] is %c, comment[%d][%d] is %c and comment[%d][%d] is  %c\n", a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*FOR DEBUGGING*/
+
           y = y + 2; /* add 2 to y so that we skip over it in the commented array!*/
           w = OUT;   /*we are OUT of a comment again*/
-          break;     /*break out of this loop, as we have broken out of the comment!*/
+          break;
+          /* break out of this loop, as we have broken out of the comment! */
         }
       }
+    }
+
+    if (nocomment[a][x] == '\0')
+    {
+      printf("DEBUGOUTPUT nocomment[%d][%d] is a null terminator!\n", a, x);
+    }
+    else if (nocomment[a][x + 1] == '\0')
+    {
+      printf("DEBUGOUTPUT nocomment[%d][%d] which is x + 1 is a null terminator!\n", a, x + 1);
+    }
+    else
+    {
+      printf("DEBUGOUTPUT neither are a null terminator\n");
+    }
+    if (comment[a][y] == '\0')
+    {
+      printf("DEBUGOUTPUT comment[%d][%d] is a null terminator!\n", a, y);
+    }
+    else if (comment[a][y + 1] == '\0')
+    {
+      printf("DEBUGOUTPUT comment[%d][%d] which is y + 1 is a null terminator!\n", a, y + 1);
+    }
+    else
+    {
+      printf("DEBUGOUTPUT neither are a null terminator\n");
     }
   }
 
@@ -139,7 +192,7 @@ void main()
 
   for (int x = 0; x < linewereon; x++) /*this prints the processed output without comments*/
   {
-    printf("DEBUGOUTPUT linewereon is %d, x is %d from nocomment[%d] which is %s\n\n", linewereon, x, x, nocomment[x]); /*FOR DEBUGGING*/
+    // printf("DEBUGOUTPUT linewereon is %d, x is %d from nocomment[%d] which is %s\n\n", linewereon, x, x, nocomment[x]); /*FOR DEBUGGING*/
     printf("%s", nocomment[x]);
   } /*print the processed, uncommented program */
 
