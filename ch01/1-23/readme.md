@@ -42,6 +42,30 @@ It remembers its state as in a comment as the line changes, until it gets to */ 
 
 "DEBUGOUTPUT leavingcomment on NEW line: nocomment[48][0] is �, comment[48][127] is * (should be an asterisk) and comment[48][128] is / (should be a slash) "
 
+1-23_delete_v12.c is a redo realizing that else and if don't work the way I thought. I thought if-else worked like this:
 
+```
+if((x != 10) && (y != 9){
+printf("x is not 10, and y is not 9.");
+}
 
+else{printf("x is 10 and y is 9.");}
 
+```
+
+However, this is not true! x could be 10, or y could be 9. only ONE of the if statements has to be BS for the entire thing to be false and for it to move onto the else.
+
+and that's where 2 hours of my life went yesterday. 
+
+.....
+
+1-23_delete_v12.c is a bit complicated now because I had to take into account every single scenario, but I did - including the scenario with single comments. I am confused, becuase I thought I would have to use *continue;* rather than *break;* to get the for loop to iterate again. This is something to look up later.
+
+While I did look up how to use the file commands as the book did not cover this yet, I am proud that I did not look at anyone else's answers, or any answer key, in making this program. This program may be a giant program, but it's my giant program - and I didn't import any library other than stdio.h to make it. I am content. :) 
+
+1-23_delete_v12_singlelinedebug.c is getting single line to work as well as normal comments
+
+1-23_delete_v13.c is where I remove all debug code to make it neater. 
+
+1-23_delete_v14.c is where I make opening a file a neat function and also make the formatting neater so it looks identical after single line comments.
+ If the else at line 168 runs, I am in big trouble. I can't get it to run though. I will import larger programs in later to see what happens. 
