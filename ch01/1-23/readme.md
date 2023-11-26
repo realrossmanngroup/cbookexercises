@@ -127,3 +127,11 @@ What I need to do for v17, is while checking for comments,
 a) add a boolean flag that is flagged when we are outside, or inside, a string literal
 b) add a condition to comment checking that does it when insidestringliteral == false
 
+AND IT WORKS 
+
+It took five hours to write a working function for this. five hours.
+but it works.
+
+1-23_delete_v17.c can process itself, and then create a file that compiles perfectly with gcc. You can run THAT file through the program it made and it works.
+
+I am done with this exercise. I might go back and make some things into functions at a later date so it is neater and easier to follow, but this was horrible so I am taking a break. My god it works :D

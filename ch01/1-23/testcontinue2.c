@@ -25,3 +25,8 @@ int main()
         printf("more dumb shit you should avoid by pressing 5\n");
     }
 }
+
+
+if ((comment[a][y] == '\"' && (y == 0 || comment[a][y-1] != '\\')) || (comment[a][y] == '\'' && (y == 0 || comment[a][y-1] != '\\'))) {
+    stringLiteral = (stringLiteral == OUT) ? IN : OUT;
+}

@@ -11,6 +11,34 @@
 #define FALSE 0 /*multiline comment has not ended*/
 #define TRUE 1  /*multiline comment has ended*/
 
+// FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
+
+int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int y)
+{
+    /*this handles strings in double quotes */
+    if (currentchar == '\"' && (y == 0 || previouschar != '\\'))
+    {
+        keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
+    }
+
+    /*this handles them in single quotes */
+    if (currentchar == '\'' && (y == 0 || previouschar != '\\'))
+    {
+        if (keeptrackofstring == OUT)
+        { // Only toggle for char literal if not in a string literal
+            keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
+        }
+    }
+
+    /*so I don't get trolled by backslashes, singlequotes, or other garbage like I have been for the past 5 hours*/
+    if (currentchar == '\\' && (y > 0 && (previouschar == '\\' || previouschar == '\'')))
+    {
+        y++; // Increment y to skip the next character
+    }
+
+    return keeptrackofstring; // Return the state of being inside a string literal
+}
+
 // FUNCTION TO OPEN A FILE FOR PROCESSING & REMOVING COMMENTS FROM
 
 FILE *openfile()
@@ -93,6 +121,7 @@ void main()
     int x = 0;                               /*use in for loop to count up in the nocomments array. this goes up when there are no comments */
     int w = OUT;                             /*used to keep track of where we are - IN or OUT of a comment? Start out of a comment */
     int stringliteral;                       /*used to keep track of where we are, IN or OUT of a string literal. ex. printf("this is NOT a comment // because it is inside a string") */
+    int charliteral;                         /*because ' and " are not the same, but can mess with my strings anyway. "*/
     int y = 0;                               /*use in for loop to count up in the comments array - this goes up when there are no comments, and when there are comments*/
     int linewereon = 0;                      /* keep track of what line we are on in our string array while copying input file to it*/
     int wheretoplacenullterminator = 0;      /*where to place null terminator as we copy each line*/
@@ -140,22 +169,8 @@ void main()
     for (int a = 0; a <= linewereon; a++, x = 0, y = 0)
     {
         stringliteral = OUT; /*each time we start a new line, assume we are not inside a string literal. I'm assuming there's no way
-                             to put a string across multiple lines. If there is, I am going to shoot myself. */
+                            to put a string across multiple lines. If there is, I am going to shoot myself. */
 
-
-/* WORK ON THIS TO FIGURE OUT IF INSIDE A STRING LITERAL
-
-if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
-    if (y == 0 || comment[a][y-1] != '\\') {
-        if (stringLiteral == OUT) {
-            stringLiteral = IN;
-        } else {
-            stringLiteral = OUT;
-        }
-    }
-}
-
-*/
         if (singlelinecomment == YES)
         {
             singlelinecomment = NO;
@@ -167,82 +182,84 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
             /*write the logic for not iterating upwards when a /* is seen until a */ // is seen.
             while ((comment[a][y] != '\0') && (y < MAXLINELENGTH - 1))
             {
-                if (comment[a][y] == "\"")
-                    if ((comment[a][y] == '/') && (comment[a][y + 1] == '/')) /*if we see a SINGLE line comment*/
+                stringliteral = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], y); // Keep track of whether we're in a string literal
+                if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT))           /*if we see a SINGLE line comment OUTSIDE OF A STRING*/
+                {
+                    printf("DEBUGOUTPUT line number: %d stringliteral is %d I DETECTED A SINGLE LINE COMMENT AT comment[%d][%d] which is %c (should be a slash) and comment[%d][%d] which is %c (should be a slash)! w is %d\n", __LINE__, stringliteral, a, y, comment[a][y], a, y + 1, comment[a][y + 1], w); /*debugoutput*/
+                                                                                                                                                                                                                                                                                                                // singlelinecomment = YES;
+                    nocomment[a][x] = '\n';                                                                                                                                                                                                                                                                     /*replace the single line comment with a newline character so the formatting isn't a mess*/
+                    nocomment[a][x + 1] = '\0';                                                                                                                                                                                                                                                                 /*null terminate the line*/
+                    break;                                                                                                                                                                                                                                                                                      /*we get out of here. There's nothing to do. Go to the next line. */
+                }
+                else if ((comment[a][y] != '/') && (comment[a][y + 1] != '*'))
+                {            /*if we do not see the first part of a comment, copy the commented array to the non-commented array directly*/
+                    w = OUT; /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];
+                    printf("DEBUGOUTPUT line number: %d copying stuff from comment to nocomment on line 1, NOT in comment: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;
+                    y++;
+                }
+                else if (((comment[a][y] == '/') && (comment[a][y + 1] == '*')) && (stringliteral == OUT))                    /*if we DO see a comment, iterate the commented array character up without iterating new array character up, and don't copy the text over*/
+                {                                                                                                             /*I changed this to an else-if because C is dumb and runs this else as long as ONE of the conditions in the above if is false, not both. I need to make sure this only runs when we get into a comment man!!*/
+                    y = y + 2;                                                                                                /*move past the two characters that begin the comment in the comment[] array*/
+                    w = IN; /*mark our status: we are inside a comment*/                                                      /*we are IN a comment*/
+                    while ((w != OUT) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*this runs until we see the characters that end the comment*/
                     {
-                        printf("DEBUGOUTPUT I DETECTED A SINGLE LINE COMMENT AT comment[%d][%d] which is %c (should be a slash) and comment[%d][%d] which is %c (should be a slash)! w is %d\n", a, y, comment[a][y], a, y + 1, comment[a][y + 1], w); /*debugoutput*/
-                        singlelinecomment = YES;
-                        nocomment[a][x] = '\n'; /*replace the single line comment with a newline character so the formatting isn't a mess*/
-                        break;                  /*we get out of here. There's nothing to do. Go to the next line. */
-                    }
-                    else if ((comment[a][y] != '/') && (comment[a][y + 1] != '*'))
-                    {            /*if we do not see the first part of a comment, copy the commented array to the non-commented array directly*/
-                        w = OUT; /*we are OUT of a comment*/
-                        nocomment[a][x] = comment[a][y];
-                        printf("DEBUGOUTPUT copying stuff from comment to nocomment on line 1, NOT in comment: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        x++;
-                        y++;
-                    }
-                    else if ((comment[a][y] == '/') && (comment[a][y + 1] == '*'))                                                /*if we DO see a comment, iterate the commented array character up without iterating new array character up, and don't copy the text over*/
-                    {                                                                                                             /*I changed this to an else-if because C is dumb and runs this else as long as ONE of the conditions in the above if is false, not both. I need to make sure this only runs when we get into a comment man!!*/
-                        y = y + 2;                                                                                                /*move past the two characters that begin the comment in the comment[] array*/
-                        w = IN; /*mark our status: we are inside a comment*/                                                      /*we are IN a comment*/
-                        while ((w != OUT) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*this runs until we see the characters that end the comment*/
-                        {
-                            w = IN;
-                            printf("DEBUGOUTPUT inside a MULTILINE comment on line 1: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                        stringliteral = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], y); // check if we're in a string
+                        w = IN;
+                        printf("DEBUGOUTPUT line number: %d inside a MULTILINE comment on line 1: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
 
-                            y++;
-                            if ((y == MAXLINELENGTH - 3) || (comment[a][y] == '\0') || (comment[a][y + 1] == '\0'))
-                            { /*if we made it to the end of the line and the multiline comment hasn't ended, add a newline character */
-                                nocomment[a][x] = '\n';
-                            }                                                         /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
-                            if ((comment[a][y] == '*') && (comment[a][y + 1] == '/')) /*Look out for the two characters that end the comment block!*/
-                            {
-                                printf("DEBUGOUTPUT end of multiline comment on line 1: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                                y = y + 2;                                                                                                                                                                                                               /* add 2 to y so that we skip over it in the commented array!*/
-                                w = OUT;                                                                                                                                                                                                                 /*we are OUT of a comment again, this breaks us out of this while loop*/
-                            }
+                        y++;
+                        if (((y == MAXLINELENGTH - 3) || (comment[a][y] == '\0') || (comment[a][y + 1] == '\0')) && (stringliteral == OUT))
+                        { /*if we made it to the end of the line and the multiline comment hasn't ended, add a newline character */
+                            nocomment[a][x] = '\n';
+                        }                                                                                     /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
+                        if (((comment[a][y] == '*') && (comment[a][y + 1] == '/')) && (stringliteral == OUT)) /*Look out for the two characters that end the comment block!*/
+                        {
+                            printf("DEBUGOUTPUT line number: %d end of multiline comment on line 1: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                            y = y + 2;                                                                                                                                                                                                                                                                             /* add 2 to y so that we skip over it in the commented array!*/
+                            w = OUT;                                                                                                                                                                                                                                                                               /*we are OUT of a comment again, this breaks us out of this while loop*/
                         }
                     }
-                    else if ((comment[a][y] != '/') && (comment[a][y + 1] == '*'))
-                    {            /*This catches a single asterisk on the right side of a blank and makes sure we copy it over. */
-                        w = OUT; /*we are OUT of a comment*/
-                        nocomment[a][x] = comment[a][y];
-                        printf("DEBUGOUTPUT outside comment on line 1, asterisk on right: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        x++;
-                        y++;
-                    }
-                    else if ((comment[a][y] == '*') && (comment[a][y + 1] != '/'))
-                    {            /*This catches a single asterisk on the left side of a blank and makes sure we copy it over. */
-                        w = OUT; /*we are OUT of a comment*/
-                        nocomment[a][x] = comment[a][y];
-                        printf("DEBUGOUTPUT outside comment on line 1, asterisk on left: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        x++;
-                        y++;
-                    }
-                    else if ((comment[a][y] == '/') && ((comment[a][y + 1] != '*') || (comment[a][y + 1] != '/')))
-                    {            /*This catches a single slash on the left side of a blank and makes sure we copy it over. */
-                        w = OUT; /*we are OUT of a comment*/
-                        nocomment[a][x] = comment[a][y];
-                        printf("DEBUGOUTPUT outside comment on line 1, slash on left: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        x++;
-                        y++;
-                    }
-                    else if ((comment[a][y] != '/') || ((comment[a][y] != '*') && (comment[a][y + 1] == '/')))
-                    {            /*This catches a single slash on the right side of a blank and makes sure we copy it over. */
-                        w = OUT; /*we are OUT of a comment*/
-                        nocomment[a][x] = comment[a][y];
-                        printf("DEBUGOUTPUT outside comment on line 1, asterisk on right : w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        x++;
-                        y++;
-                    }
+                }
+                else if ((comment[a][y] != '/') && (comment[a][y + 1] == '*'))
+                {            /*This catches a single asterisk on the right side of a blank and makes sure we copy it over. */
+                    w = OUT; /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];
+                    printf("DEBUGOUTPUT line number: %d outside comment on line 1, asterisk on right: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;
+                    y++;
+                }
+                else if ((comment[a][y] == '*') && (comment[a][y + 1] != '/'))
+                {            /*This catches a single asterisk on the left side of a blank and makes sure we copy it over. */
+                    w = OUT; /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];
+                    printf("DEBUGOUTPUT line number: %d outside comment on line 1, asterisk on left: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;
+                    y++;
+                }
+                else if ((comment[a][y] == '/') && ((comment[a][y + 1] != '*') || (comment[a][y + 1] != '/')))
+                {            /*This catches a single slash on the left side of a blank and makes sure we copy it over. */
+                    w = OUT; /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];
+                    printf("DEBUGOUTPUT line number: %d outside comment on line 1, slash on left: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;
+                    y++;
+                }
+                else if ((comment[a][y] != '/') || ((comment[a][y] != '*') && (comment[a][y + 1] == '/')))
+                {            /*This catches a single slash on the right side of a blank and makes sure we copy it over. */
+                    w = OUT; /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];
+                    printf("DEBUGOUTPUT line number: %d outside comment on line 1, slash on right: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;
+                    y++;
+                }
 
-                    else
-                    {
-                        printf("If you're here, you're truly lost: I don't know what to tell you\n");
-                        break; /*FOR DEBUGGING*/
-                    }
+                else
+                {
+                    printf("If you're here, you're truly lost: I don't know what to tell you\n");
+                    break; /*FOR DEBUGGING*/
+                }
             }
         }
         else
@@ -255,24 +272,26 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                     /*if W = IN, we are in a comment as we enter a new line:*/
                     while ((y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0')) && (w != OUT)) /*this runs until we see the characters that end the comment*/
                     {
+                        stringliteral = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], y); // check if we're in a string
+
                         w = IN;
-                        printf("DEBUGOUTPUT INSIDE multiline comment on line 2, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                        y++;                                                                                                                                                                                                                     /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
-                        if ((comment[a][y - 1] == '/') && (comment[a][y] == '/'))                                                                                                                                                                /*if we see a SINGLE line comment*/
+                        printf("DEBUGOUTPUT line number: %d INSIDE multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
+                        y++;                                                                                  /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
+                        if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT)) /*if we see a SINGLE line comment*/
                         {
 
-                            printf("DEBUGOUTPUT WE FOUND A SINGLELINE // COMMENT INSIDE multiline comment on line 2, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y - 1, comment[a][y - 1], a, y, comment[a][y]); /*for debugging*/
+                            printf("DEBUGOUTPUT line number: %d WE FOUND A SINGLELINE // COMMENT INSIDE multiline comment on line 2, stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y - 1, comment[a][y - 1], a, y, comment[a][y]);
                             w = IN;
                             y = y + 1; /*skip over it*/
                             w = IN;
                         }
-                        if (comment[a][y] == '*' && comment[a][y + 1] == '/') /*Look out for the two characters that end the comment block!*/
+                        if ((comment[a][y - 1] == '*' && comment[a][y] == '/') && (stringliteral == OUT)) /*Look out for the two characters that end the comment block!*/
                         {
-                            printf("DEBUGOUTPUT end of multiline comment on line 2: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);              /*for debugging*/
-                                                                                                                                                                                                                                                                  //  multilinecommentend = TRUE; /*this will take us to the top of the loop*/
-                            y = y + 2;                                                                                                                                                                                                                            /* add 2 to y so that we skip over it in the commented array!*/
-                            w = OUT;                                                                                                                                                                                                                              /*we are OUT of a comment again*/
-                            printf("DEBUGOUTPUT we skipped over the multiline comment on line 2: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line number: %d end of multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
+                            //  multilinecommentend = TRUE; /*this will take us to the top of the loop*/
+                            y = y + 2; /* add 2 to y so that we skip over it in the commented array!*/
+                            w = OUT;   /*we are OUT of a comment again*/
+                            printf("DEBUGOUTPUT line number: %d we skipped over the multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                         }
                     }
                 }
@@ -280,40 +299,45 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                 { /*write the logic for not iterating upwards when a /* is seen until a */ // is seen.
                     while ((comment[a][y] != '\0') && (y < MAXLINELENGTH - 1))
                     {
-                        if ((comment[a][y] == '/') && (comment[a][y + 1] == '/')) /*if we see a SINGLE line comment*/
+                        stringliteral = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], y); // check if we're in a string
+
+                        if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT)) /*if we see a SINGLE line comment*/
                         {
-                            printf("DEBUGOUTPUT I DETECTED A SINGLE LINE COMMENT AT comment[%d][%d] which is %c (should be a slash) and comment[%d][%d] which is %c (should be a slash)! w is %d\n", a, y, comment[a][y], a, y + 1, comment[a][y + 1], w); /*debugoutput*/
+                            printf("DEBUGOUTPUT line number: %d stringliteral is %d I DETECTED A SINGLE LINE COMMENT AT comment[%d][%d] which is %c (should be a slash) and comment[%d][%d] which is %c (should be a slash)! w is %d\n", __LINE__, stringliteral, a, y, comment[a][y], a, y + 1, comment[a][y + 1], w);
                             singlelinecomment = YES;
-                            nocomment[a][x] = '\n'; /*replace the single line comment with a newline character so the formatting isn't a mess*/
-                            break;                  /*we get out of here. There's nothing to do. Go to the next line. */
+                            nocomment[a][x] = '\n';     /*replace the single line comment with a newline character so the formatting isn't a mess*/
+                            nocomment[a][x + 1] = '\0'; // null terminate the end of the line break;
+                            break;                      /*we get out of here. There's nothing to do. Go to the next line. */
                         }
                         else if ((comment[a][y] != '/') && (comment[a][y + 1] != '*'))
                         {            /*if we do not see the first part of a comment, copy the commented array to the non-commented array directly*/
                             w = OUT; /*we are OUT of a comment*/
                             nocomment[a][x] = comment[a][y];
-                            printf("DEBUGOUTPUT copying stuff from comment to nocomment on line 2, NOT in comment: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line number: %d stringliteral is %d copying stuff from comment to nocomment on line 2, NOT in comment: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                             x++;
                             y++;
                         }
-                        else if ((comment[a][y] == '/') && (comment[a][y + 1] == '*'))                                                /*if we DO see a comment, iterate the commented array character up without iterating new array character up, and don't copy the text over*/
+                        else if (((comment[a][y] == '/') && (comment[a][y + 1] == '*')) && (stringliteral == OUT))                    /*if we DO see a comment, iterate the commented array character up without iterating new array character up, and don't copy the text over*/
                         {                                                                                                             /*I changed this to an else-if because C is dumb and runs this else as long as ONE of the conditions in the above if is false, not both. I need to make sure this only runs when we get into a comment man!!*/
                             y = y + 2;                                                                                                /*move past the two characters that begin the comment in the comment[] array*/
                             w = IN; /*mark our status: we are inside a comment*/                                                      /*we are IN a comment*/
                             while ((w != OUT) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*this runs until we see the characters that end the comment*/
                             {
+                                stringliteral = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], y); // check if we're in a string
+
                                 w = IN;
-                                printf("DEBUGOUTPUT inside a MULTILINE comment on line 2: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                                printf("DEBUGOUTPUT line number: %d inside a MULTILINE comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
 
                                 y++;
-                                if ((y == MAXLINELENGTH - 3) || (comment[a][y] == '\0') || (comment[a][y + 1] == '\0'))
+                                if (((y == MAXLINELENGTH - 3) || (comment[a][y] == '\0') || (comment[a][y + 1] == '\0')) && (stringliteral == OUT))
                                 { /*if we made it to the end of the line and the multiline comment hasn't ended, add a newline character */
                                     nocomment[a][x] = '\n';
-                                }                                                         /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
-                                if ((comment[a][y] == '*') && (comment[a][y + 1] == '/')) /*Look out for the two characters that end the comment block!*/
+                                }                                                                                     /* once we see the two characters that begin the comment, we iterate y for the commented array up without iterating x for the non-commented array*/
+                                if (((comment[a][y] == '*') && (comment[a][y + 1] == '/')) && (stringliteral == OUT)) /*Look out for the two characters that end the comment block!*/
                                 {
-                                    printf("DEBUGOUTPUT end of multiline comment on line 2: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
-                                    y = y + 2;                                                                                                                                                                                                               /* add 2 to y so that we skip over it in the commented array!*/
-                                    w = OUT;                                                                                                                                                                                                                 /*we are OUT of a comment again, this breaks us out of this while loop*/
+                                    printf("DEBUGOUTPUT line %d: end of multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
+                                    y = y + 2; /* add 2 to y so that we skip over it in the commented array!*/
+                                    w = OUT;   /*we are OUT of a comment again, this breaks us out of this while loop*/
                                 }
                             }
                         }
@@ -321,7 +345,7 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                         {            /*This catches a single asterisk on the right side of a blank and makes sure we copy it over. */
                             w = OUT; /*we are OUT of a comment*/
                             nocomment[a][x] = comment[a][y];
-                            printf("DEBUGOUTPUT outside comment on line 2, asterisk on right: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line %d: outside comment on line 2, asterisk on right: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                             x++;
                             y++;
                         }
@@ -329,7 +353,7 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                         {            /*This catches a single asterisk on the left side of a blank and makes sure we copy it over. */
                             w = OUT; /*we are OUT of a comment*/
                             nocomment[a][x] = comment[a][y];
-                            printf("DEBUGOUTPUT outside comment on line 2, asterisk on left: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line %d: outside comment on line 2, asterisk on left: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                             x++;
                             y++;
                         }
@@ -337,7 +361,7 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                         {            /*This catches a single slash on the left side of a blank and makes sure we copy it over. */
                             w = OUT; /*we are OUT of a comment*/
                             nocomment[a][x] = comment[a][y];
-                            printf("DEBUGOUTPUT outside comment on line 2, slash on left: w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line %d: outside comment on line 2, slash on left: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                             x++;
                             y++;
                         }
@@ -345,7 +369,7 @@ if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
                         {            /*This catches a single slash on the right side of a blank and makes sure we copy it over. */
                             w = OUT; /*we are OUT of a comment*/
                             nocomment[a][x] = comment[a][y];
-                            printf("DEBUGOUTPUT outside comment on line 2, asterisk on right : w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /*for debugging*/
+                            printf("DEBUGOUTPUT line %d: outside comment on line 2, asterisk on right: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                             x++;
                             y++;
                         }
