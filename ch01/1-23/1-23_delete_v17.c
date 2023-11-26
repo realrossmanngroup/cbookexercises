@@ -144,8 +144,16 @@ void main()
 
 
 /* WORK ON THIS TO FIGURE OUT IF INSIDE A STRING LITERAL
-if ((comment[a][y] == '\"' && (y == 0 || comment[a][y-1] != '\\')) || (comment[a][y] == '\'' && (y == 0 || comment[a][y-1] != '\\'))) {
-    stringLiteral = (stringLiteral == OUT) ? IN : OUT;
+
+if ((comment[a][y] == '\"') || (comment[a][y] == '\'')) {
+    if (y == 0 || comment[a][y-1] != '\\') {
+        if (stringLiteral == OUT) {
+            stringLiteral = IN;
+        } else {
+            stringLiteral = OUT;
+        }
+    }
+}
 
 */
         if (singlelinecomment == YES)
