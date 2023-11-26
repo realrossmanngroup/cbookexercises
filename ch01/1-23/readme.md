@@ -69,3 +69,61 @@ While I did look up how to use the file commands as the book did not cover this 
 
 1-23_delete_v14.c is where I make opening a file a neat function and also make the formatting neater so it looks identical after single line comments.
  If the else at line 168 runs, I am in big trouble. I can't get it to run though. I will import larger programs in later to see what happens. 
+
+After all this work, my code does not work if a singleline comment is found inside a multiline comment. I am guilty of nothing other than using a shitty editor. nano betrayed me. Look at vscode_comments.png & nano_comments.png and you'll see what I mean. My code works correctly **ASSUMING THAT THE C COMPILER SEES COMMENTS THE WAY NANO TOLD ME IT DID!** But, it doesn't. nano betrayed me, and because of that, we are back to the drawing board. 
+
+1-23_delete_v15.c is where I put debug code back in & try to figure it out and make it work. Lesson learned - never use nano again. I started using nano when I installed gentoo for the first time in 2003 & nano was the default text editor all of the instruction manuals used for configuring things while installing. 
+
+```
+This is an analysis of 1-23_delete_v15.c, my program exercise answer to exercise 1-23, with a punchlist of what I must try to correct and fix. 
+
+I ran my program on ht.c , with output at ht2.c As the debug output I added shows, my program correctly sees that comment[3][4] is a "*" and comment[3][5] is a "/" - these two characters make up a "*/" , which is how you know a multiline comment has ended in C. My program correctly detects that on line 3, a multiline comment begins before the sentence "start main function" which is inside the multiline comment, and that the multiline comment continues until line 4, where it ends. 
+
+However, my program does not print the rest of the line after the multiline comment ends. It leaves out "int c;" in its output code. 
+
+Here is why I think my program should work:
+
+1) line 250 in my code sets w = OUT once it properly detects that a multiline comment has ended. 
+
+2) my while loop at line 232 is set to run when w != OUT, so I should be out of my while loop.
+
+3) Once out of my while loop, I should be back at the if statement at line 141. 
+
+4) This if statement should test as false, since singlelinecomment is not YES. 
+
+5) This should then lead us to the if statement at 146, which would test true, since we set w = OUT on line 250. 
+
+6) This should then lead us to the while lop on line 150, where we go through each character on the line again, checking characters & coping them over. 
+
+7) Line 152's if statement will be false, since there are no more multiline comment beginnings expressed as "/*" or multiline comment endings expressed as "*/" in that line
+
+8) The else if statement on 159 will be checked, and be true, as the characters for the remainder of the line are NOT a "/*", and the characters on this line including "int c;" will be copied over from comment[][] to nocomment[][] as the code on lines 160-166 are run. 
+
+However, this is not what happens. "int c;" from ht.c is present in my input code, it is not inside a comment, but it is missing from my output code at ht2.c
+
+It appears, from my debug output, that what is actually happening is my for loop on line 129 is iterating and taking me to the next line when my code from lines 245-252 correctly detects a "*/" ending the multiline comment in my test input that comes before "int c;" on line 4.
+
+I need to figure out why my for loop is iterating when I do not want it to, and how can I keep it from iterating when a multiline comment ends but there is text after it within the code that I have. 
+```
+
+When I broke out of my while loop at line 250, I was iterating the for loop. I needed to have a while loop above it that would then properly process everything that was not a comment. That is what 1-23_delete_v16.c attempts to do.
+
+When I run 1-23_delete_v16.c on ht.c again, I get ht2_v16's_output.c - which works! 
+
+Not to get too excited, I decided to run 1-23_delete_v16.c on itself. 
+
+I will admit, 1-23_delete_v16.c is disgusting. There is a lot of copied & pasted code, meaning that something here should be a function. However, I have spent many hours trying to get this to work and I need to rest my brain. I will come back to this later. 
+
+1-23_delete_v16.c doesn't track whether we are inside a string literal though. 
+
+printf("this is a print statement, I am printing //");
+
+This // is NOT a comment, because it is inside of the quotes. 
+
+Funnily enough, throughout this entire process, I was visually checking to see if it made sense, rather than actually trying to compile the output. That's funny.
+
+What I need to do for v17, is while checking for comments, 
+
+a) add a boolean flag that is flagged when we are outside, or inside, a string literal
+b) add a condition to comment checking that does it when insidestringliteral == false
+
