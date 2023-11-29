@@ -291,14 +291,13 @@ void main()
                             w = OUT;   /*we are OUT of a comment again*/
                             printf("DEBUGOUTPUT line number: %d we skipped over the multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                         }
-                        else if (((comment[a][y] == '*') && (comment[a][y + 1] == '/')) && (stringliteral == IN)) /* If we are not in a multiline comment(above) and we come across a multiline comment beginning while in a string, copy code over*/
-                {
-                    w = IN;                                                                                                                                                                                                                                                                                                              /*we are OUT of a comment*/
-                
-                    printf("DEBUGOUTPUT line number: %d in multiline comment on line 2, stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
-                
-                    y++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the nocomment array
-                }
+                        else if (((comment[a][y] == '*') && (comment[a][y + 1] == '/')) && (stringliteral == IN)) /* If we meet the end of a comment inside a string literal, it doesn't matter, because... you're not in a string when you're inside a comment. If we are inside a multiline comment, and we see a quote, it doesn't matter */
+                        {
+                            y = y + 2; /* add 2 to y so that we skip over it in the commented array!*/
+                            w = OUT;   /*we are OUT of a comment again*/
+
+                            printf("DEBUGOUTPUT line number: %d in multiline comment on line 2, stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                        }
                     }
                 }
                 else
