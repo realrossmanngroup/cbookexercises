@@ -75,6 +75,7 @@ FILE *openfile()
     if (program == NULL)
     { /*error handling if it cannot open the file*/
         perror("Error opening file");
+        fclose(program);
     }
     else
     {
@@ -113,6 +114,7 @@ FILE *savefile()
     if (outputfile == NULL)
     { /*error handling if it cannot open the file*/
         perror("Error creating file");
+        fclose(outputfile);
     }
     else
     {
