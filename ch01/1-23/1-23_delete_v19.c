@@ -221,6 +221,14 @@ void main()
                     x++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the comment array
                     y++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the nocomment array
                 }
+                else if (((comment[a][y] == '/') && (comment[a][y + 1] == '*')) && (stringliteral == IN)) /* If we are not in a multiline comment(above) and we come across a multiline comment beginning while in a string, copy code over*/
+                {
+                    w = OUT;                                                                                                                                                                                                                                                                                                              /*we are OUT of a comment*/
+                    nocomment[a][x] = comment[a][y];                                                                                                                                                                                                                                                                                      // copy text from the comment array to the nocomment array
+                    printf("DEBUGOUTPUT line number: %d copying stuff from comment to nocomment on line 1, NOT in comment: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                    x++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the comment array
+                    y++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the nocomment array
+                }
                 else if (((comment[a][y] == '/') && (comment[a][y + 1] == '*')) && (stringliteral == OUT))                    /*if we DO see a multiline comment, iterate the commented array character up without iterating new array character up, and don't copy the text over*/
                 {                                                                                                             /*I changed this to an else-if because C is dumb and runs this else as long as ONE of the conditions in the above if is false, not both. I need to make sure this only runs when we get into a comment man!!*/
                     y = y + 2;                                                                                                /*move past the two characters that begin the comment in the comment[] array*/
@@ -246,6 +254,8 @@ void main()
                 else
                 {
                     printf("If you're here, you're truly lost: I don't know what to tell you\n");
+                    printf("DEBUGOUTPUT line number: %d on line 1, at the else NOT in comment: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+
                     break; /*FOR DEBUGGING*/
                 }
             }
@@ -281,6 +291,14 @@ void main()
                             w = OUT;   /*we are OUT of a comment again*/
                             printf("DEBUGOUTPUT line number: %d we skipped over the multiline comment on line 2: stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
                         }
+                        else if (((comment[a][y] == '*') && (comment[a][y + 1] == '/')) && (stringliteral == IN)) /* If we are not in a multiline comment(above) and we come across a multiline comment beginning while in a string, copy code over*/
+                {
+                    w = IN;                                                                                                                                                                                                                                                                                                              /*we are OUT of a comment*/
+                
+                    printf("DEBUGOUTPUT line number: %d in multiline comment on line 2, stringliteral is %d, w is %d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, w, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
+                
+                    y++;                                                                                                                                                                                                                                                                                                                  // go to the next character in the nocomment array
+                }
                     }
                 }
                 else

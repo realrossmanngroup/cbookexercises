@@ -135,3 +135,8 @@ but it works.
 1-23_delete_v17.c can process itself, and then create a file that compiles perfectly with gcc. You can run THAT file through the program it made and it works.
 
 I am done with this exercise. I might go back and make some things into functions at a later date so it is neater and easier to follow, but this was horrible so I am taking a break. My god it works :D
+
+1-23_delete_v18.c was me turning certain elements into functions
+
+1-23_delete_v19.c was where I realized that the statement I was using on line 194 of 1-23_delete_v17.c of `else if ((comment[a][y] != '/') && (comment[a][y + 1] != '*'))` was wrong. By making it a || instead of a &&, I can remove countless lines of junk that checks for a slash on the left, a slash on the right, an asterisk on the left, or an asterisk on the right. Since we've already checked for a singleline comment with //, I am not worried about that. Since we cannot be in a /* multiline comment if the first char isn't a / or the second char isn't equal to a *, we must be safe to copy text over. If the first character *IS* a slash, only one of the above has to be true for the line to be true - the next character not being a * solidifies it for us. The problem with && is that it means that BOTH have to be true for the if to run.
+
