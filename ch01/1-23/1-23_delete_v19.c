@@ -5,12 +5,13 @@
 #define MAXLINELENGTH 1000
 #define MAXLINES 5000
 #define MAXFILENAME 100
-#define IN 0                             /*are we in a comment?*/
-#define OUT 1                            /*are we out of a comment?*/
-#define YES 1                            /*single line comment found?*/
-#define NO 0                             /*single line comment not found*/
-#define FALSE 0                          /*multiline comment has not ended*/
-#define TRUE 1                           /*multiline comment has ended*/
+#define IN 0    /*are we in a comment?*/
+#define OUT 1   /*are we out of a comment?*/
+#define YES 1   /*single line comment found?*/
+#define NO 0    /*single line comment not found*/
+#define FALSE 0 /*multiline comment has not ended*/
+#define TRUE 1  /*multiline comment has ended*/
+int w = OUT;    /*used to keep track of where we are - IN or OUT of a comment? Start out of a comment */
 int result = 10 / 2;                     /*testing if my program deletes a single slash when it shouldn't */
 int linecountinput = 0;                  /* keep track of what line we are on in our string array while copying input file to it*/
 int linecountoutput = 0;                 /*keep track of linecount of processed array with no comments*/
@@ -21,19 +22,16 @@ char nocomment[MAXLINES][MAXLINELENGTH]; /*this is where I am storing the uncomm
 
 int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int y)
 {
-    /*this handles strings in double quotes */
-    if (currentchar == '\"' && (y == 0 || previouschar != '\\'))
+    /* Handle strings in double quotes */
+    if (currentchar == '\"' && (y == 0 || previouschar != '\\' || w != IN))
     {
         keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
     }
 
-    /*this handles them in single quotes */
-    if (currentchar == '\'' && (y == 0 || previouschar != '\\'))
+    /* Handle characters in single quotes */
+    if (currentchar == '\'' && ((y == 0 || previouschar != '\\') && (w != IN)))
     {
-        if (keeptrackofstring == OUT)
-        { // Only toggle for char literal if not in a string literal
-            keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
-        }
+        keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
     }
 
     /*so I don't get trolled by backslashes, singlequotes, or other garbage like I have been for the past 5 hours*/
@@ -42,7 +40,15 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
         y++; // Increment y to skip the next character
     }
 
-    return keeptrackofstring; // Return the state of being inside a string literal
+    /* Return IN if inside a string or char literal, OUT otherwise */
+    if (keeptrackofstring == IN || keeptrackofchar == IN)
+    {
+        return IN;
+    }
+    else
+    {
+        return OUT;
+    }
 }
 
 // FUNCTION TO OPEN A FILE FOR PROCESSING & REMOVING COMMENTS FROM
@@ -172,9 +178,8 @@ void main()
 {
     int j = 0;                           /*use for looping to spit file being read into string array*/
     int x = 0;                           /*use in for loop to count up in the nocomments array. this goes up when there are no comments */
-    int w = OUT;                         /*used to keep track of where we are - IN or OUT of a comment? Start out of a comment */
-    int stringliteral;                   /*used to keep track of where we are, IN or OUT of a string literal. ex. printf("this is NOT a comment // because it is inside a string") */
-    int charliteral;                     /*because ' and " are not the same, but can mess with my strings anyway. "*/
+    int stringliteral = OUT;             /*used to keep track of where we are, IN or OUT of a string literal. ex. printf("this is NOT a comment // because it is inside a string") */
+    int charliteral = OUT;               /*because ' and " are not the same, but can mess with my strings anyway. "*/
     int y = 0;                           /*use in for loop to count up in the comments array - this goes up when there are no comments, and when there are comments*/
     int singlelinecomment = NO;          /*bool to tell when we're in a single line comment, initialize at 0*/
     int multilinecommentend = FALSE;     /*bool to go back to the top of the for loop & keep copying stuff when a multiline comment ends and there is more data to process on that line*/
