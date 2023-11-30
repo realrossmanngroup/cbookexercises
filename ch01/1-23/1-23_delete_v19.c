@@ -22,13 +22,13 @@ char nocomment[MAXLINES][MAXLINELENGTH]; /*this is where I am storing the uncomm
 
 int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int y)
 {
-    /* Handle strings in double quotes */
+    /* Handle strings in double quotes, only outide of comments*/
     if (currentchar == '\"' && (y == 0 || previouschar != '\\' || w != IN))
     {
         keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
     }
 
-    /* Handle characters in single quotes */
+    /* Handle characters in single quotes, only outside of comments */
     if (currentchar == '\'' && ((y == 0 || previouschar != '\\') && (w != IN)))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
