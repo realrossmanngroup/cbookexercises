@@ -267,7 +267,7 @@ void main()
 
     for (int x = minparenthesis; x <= maxparenthesis; x++)
     {
-        printf("Parenthesis %d: %d\n", x, parenthesis[x]);
+        printf("Parenthesis %d: %d\n\n", x, parenthesis[x]);
         if (parenthesis[x] != 0)
         {
             printf("line with mismatched parenthesis is probably on the %dth parenthesis: issue includes: ", x);
