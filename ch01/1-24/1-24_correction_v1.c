@@ -15,6 +15,7 @@ int prevprevious = 0;                /*the previous charcter before the previous
 int weare__acomment = OUT;           /*keep track of whether we're in a comment*/
 int weare__asinglelinecomment = OUT; /*keep track of whether we're on a single comment so we can reset it on the next line*/
 int didweescapenewline = NO;
+int howlongisthisline[MAXLINES]; /*for each line, how long is it*/
 
 // FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
 
@@ -38,7 +39,7 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
     }
 
     /* Handle characters in single quotes, only outside of comments */
-    if (currentchar == '\'' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
+    if (currentchar == '\'' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofstring == IN)) || (prevprevious == '\\' && previouschar == '\\'))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
         charliteral = keeptrackofchar;
@@ -149,8 +150,9 @@ void filetoarray(FILE *file)
             wheretoplacenullterminator = x;
         }
         program[linecountinput][wheretoplacenullterminator] = '\0'; /*place null terminator at the end of each line*/
+        howlongisthisline[linecountinput] = wheretoplacenullterminator + 1; /*keep track of the length of each line*/
 
-        if (linecountinput < MAXLINES - 1)
+        if (linecountinput < MAXLINES - 2)
         {
             linecountinput++; /* each time the while loop loops we're on a new line, so iterate the line we're on in the string array */
         }
@@ -185,15 +187,15 @@ void main()
     filetoarray(inputfile);       /* copy contents of program to program[] char array */
 
     for (y = 0; y < linecountinput; y++)
-    { /* count each line, iterate upwards */
+    { /* count each line, iterate upwards, y is a line */
         if (weare__asinglelinecomment == IN)
-            ;
+            
         {
             weare__asinglelinecomment = OUT;
         }
         for (x = 0; x < MAXCHARS - 2; x++)
         {
-            if (x > 0)
+            if (x < howlongisthisline[y]) /*limit counting to the line's length to avoid large debug output*/
             {
                 areweinastring = stringinorout(stringliteral, charliteral, program[y][x], program[y][x - 1], weare__acomment);                                                                                                                                                                 // Keep track of whether we're in a string literal
                 printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, y, x, program[y][x], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment); /*DEBUGOUTPUT*/
