@@ -23,40 +23,50 @@ char nocomment[MAXLINES][MAXLINELENGTH]; /*this is where I am storing the uncomm
 int areweinastring = OUT;                /*are we in a string*/
 int stringliteral = OUT;                 /*keep track of whether we're " " quotes*/
 int charliteral = OUT;                   /*keep track of whether we're in ' ' quotes */
-int prevprevious = 0;                    /*the previous charcter before the previous character(for checking for a \ before a \ in my stringinorout function)*/
 
 // FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
 
 int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int weare__acomment)
 {
+
+    static int escaped = NO;
     /*handle trolls that put a \ at the end of the line.
     400 lines of code for every use case and it didn't handle a troll
     putting a \ at the end of a line, escaping the newline character and tricking my
     program into thinking we are automatically out of a string because we hit enter on a
     newline. */
+
+    if (previouschar == '\\' && !escaped)
+    {
+        escaped = YES;
+    }
+    else if (escaped == YES)
+    {
+        escaped = NO;
+    }
+
     if ((currentchar == '\n') && (previouschar == '\\') && weare__acomment == OUT)
     {
+        escaped = YES;
         didweescapenewline = YES;
     }
 
     /* Handle strings in double quotes, only outside of comments */
-    if (currentchar == '\"' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
+    if (currentchar == '\"' && !(weare__acomment == IN) && !(keeptrackofchar == IN) && !(escaped == YES))
     {
         keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
         stringliteral = keeptrackofstring;
     }
 
     /* Handle characters in single quotes, only outside of comments */
-    if (currentchar == '\'' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
+    if (currentchar == '\'' && !(weare__acomment == IN) && !(keeptrackofstring == IN) && !(escaped == YES))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
         charliteral = keeptrackofchar;
     }
 
-    /* Return IN if inside a string or char literal, OUT otherwise */
-    prevprevious = previouschar;
-    return (keeptrackofstring == IN || keeptrackofchar == IN) ? IN : OUT;
 }
+
 // FUNCTION TO OPEN A FILE FOR PROCESSING & REMOVING COMMENTS FROM
 
 FILE *openfile()
