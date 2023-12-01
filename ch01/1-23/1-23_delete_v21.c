@@ -20,9 +20,10 @@ int linecountinput = 0;                  /* keep track of what line we are on in
 int linecountoutput = 0;                 /*keep track of linecount of processed array with no comments*/
 char comment[MAXLINES][MAXLINELENGTH];   /*array of strings we will store the file with comments in*/
 char nocomment[MAXLINES][MAXLINELENGTH]; /*this is where I am storing the uncommented line after processing*/
-int areweinastring = OUT; /*are we in a string*/
-int stringliteral = OUT;          /*keep track of whether we're " " quotes*/
-int charliteral = OUT;            /*keep track of whether we're in ' ' quotes */
+int areweinastring = OUT;                /*are we in a string*/
+int stringliteral = OUT;                 /*keep track of whether we're " " quotes*/
+int charliteral = OUT;                   /*keep track of whether we're in ' ' quotes */
+int prevprevious = 0;                    /*the previous charcter before the previous character(for checking for a \ before a \ in my stringinorout function)*/
 
 // FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
 
@@ -49,7 +50,7 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
     if (currentchar == '\'' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
-        charliteral = keeptrackofchar; 
+        charliteral = keeptrackofchar;
     }
 
     /* Return IN if inside a string or char literal, OUT otherwise */
@@ -220,8 +221,8 @@ void main()
 
             while ((comment[a][y] != '\0') && (y < MAXLINELENGTH - 1)) // Keep going through the line until we get to a null terminator or the end of the line
             {
-                areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment)stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // Keep track of whether we're in a string literal
-                if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT))                         /*if we see a SINGLE line comment OUTSIDE OF A STRING*/
+                areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // Keep track of whether we're in a string literal
+                if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT))                                                                                                         /*if we see a SINGLE line comment OUTSIDE OF A STRING*/
                 {
                     printf("DEBUGOUTPUT line number: %d stringliteral is %d I DETECTED A SINGLE LINE COMMENT AT comment[%d][%d] which is %c (should be a slash) and comment[%d][%d] which is %c (should be a slash)! weare__acomment is%d\n", __LINE__, stringliteral, a, y, comment[a][y], a, y + 1, comment[a][y + 1], weare__acomment); /*debugoutput*/
                     nocomment[a][x] = '\n';                                                                                                                                                                                                                                                                                                /*replace the single line comment with a newline character so the formatting isn't a mess*/
@@ -250,7 +251,7 @@ void main()
                     weare__acomment = IN;                                                                                                   /*mark our status: we are inside a comment*/
                     while ((weare__acomment != OUT) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*Keep iterating nocomment[a][y] forward, looking for the end of the comment, until we get to a null terminator or the end of the line: run as long as we are in a comment*/
                     {
-                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment)stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment);                                                                                                                                                                                                       // check if we're in a string
+                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment);                                                                                                                       // check if we're in a string
                         weare__acomment = IN;                                                                                                                                                                                                                                                                                               // set that we are IN a comment
                         printf("DEBUGOUTPUT line number: %d inside a MULTILINE comment on line 1: stringliteral is %d, weare__acomment is%d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, weare__acomment, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]); /* for debugging */
                         y++;                                                                                                                                                                                                                                                                                                                // move forward in the comment[a][y] array skipping over elements of the text as long as we are still inside a comment
@@ -285,7 +286,7 @@ void main()
                     /*if weare__acomment = IN, we are in a comment as we enter a new line:*/
                     while ((y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0')) && (weare__acomment != OUT)) /*this runs until we see the characters that end the comment*/
                     {
-                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment)stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
+                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
 
                         weare__acomment = IN;
                         printf("DEBUGOUTPUT line number: %d INSIDE multiline comment on line 2: stringliteral is %d, weare__acomment is%d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, weare__acomment, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
@@ -319,7 +320,7 @@ void main()
                 { /*write the logic for not iterating upwards when a /* is seen until a */ // is seen.
                     while ((comment[a][y] != '\0') && (y < MAXLINELENGTH - 1))
                     {
-                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment)stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
+                        areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
 
                         if (((comment[a][y] == '/') && (comment[a][y + 1] == '/')) && (stringliteral == OUT)) /*if we see a SINGLE line comment*/
                         {
@@ -343,7 +344,7 @@ void main()
                             weare__acomment = IN; /*mark our status: we are inside a comment*/                                                      /*we are IN a comment*/
                             while ((weare__acomment != OUT) && (y < MAXLINELENGTH - 2) && ((comment[a][y] != '\0') || (comment[a][y + 1] != '\0'))) /*this runs until we see the characters that end the comment*/
                             {
-                                areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment)stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
+                                areweinastring = stringinorout(stringliteral, charliteral, comment[a][y], comment[a][y - 1], weare__acomment); // check if we're in a string
 
                                 weare__acomment = IN;
                                 printf("DEBUGOUTPUT line number: %d inside a MULTILINE comment on line 2: stringliteral is %d, weare__acomment is%d, nocomment[%d][%d] is %c, comment[%d][%d] is %c, comment[%d][%d] is %c \n", __LINE__, stringliteral, weare__acomment, a, x, nocomment[a][x], a, y, comment[a][y], a, y + 1, comment[a][y + 1]);
