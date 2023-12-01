@@ -2,16 +2,18 @@
 #define MAXCHARS 1000
 #define MAXLINES 1000
 #define MAXFILENAME 100
-#define IN 0                      /*are we in a comment?*/
-#define OUT 1                     /*are we out of a comment?*/
-#define YES 1                           
-#define NO 0                            
-int linecountinput = 0;           /* keep track of what line we are on in our string array while copying input file to it*/
-char program[MAXLINES][MAXCHARS]; /*array of strings we will store the file with comments in*/
-int stringliteral = OUT;          /*keep track of whether we're in a string literal*/
-int charliteral = OUT;            /*keep track of whether we're in a char literal */
-int weare__acomment = OUT;                      /*keep track of whether we're in a comment*/
-int weare__asinglelinecomment = OUT;                    /*keep track of whether we're on a single comment so we can reset it on the next line*/
+#define IN 0  /*are we in a comment?*/
+#define OUT 1 /*are we out of a comment?*/
+#define YES 1
+#define NO 0
+int linecountinput = 0;              /* keep track of what line we are on in our string array while copying input file to it*/
+char program[MAXLINES][MAXCHARS];    /*array of strings we will store the file with comments in*/
+int areweinastring = OUT;            /*are we in a string*/
+int stringliteral = OUT;             /*keep track of whether we're " " quotes*/
+int charliteral = OUT;               /*keep track of whether we're in ' ' quotes */
+int prevprevious = 0;                /*the previous charcter before the previous character(for checking for a \ before a \ in my stringinorout function)*/
+int weare__acomment = OUT;           /*keep track of whether we're in a comment*/
+int weare__asinglelinecomment = OUT; /*keep track of whether we're on a single comment so we can reset it on the next line*/
 int didweescapenewline = NO;
 
 // FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
@@ -29,18 +31,21 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
     }
 
     /* Handle strings in double quotes, only outside of comments */
-    if (currentchar == '\"' && weare__acomment != IN && !(previouschar == '\\' && keeptrackofstring == IN))
+    if (currentchar == '\"' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
     {
         keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
+        stringliteral = keeptrackofstring;
     }
 
     /* Handle characters in single quotes, only outside of comments */
-    if (currentchar == '\'' && weare__acomment != IN && !(previouschar == '\\' && keeptrackofchar == IN))
+    if (currentchar == '\'' && weare__acomment != IN && !((previouschar == '\\' && keeptrackofchar == IN)) || (prevprevious == '\\' && previouschar == '\\'))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
+        charliteral = keeptrackofchar;
     }
 
     /* Return IN if inside a string or char literal, OUT otherwise */
+    prevprevious = previouschar;
     return (keeptrackofstring == IN || keeptrackofchar == IN) ? IN : OUT;
 }
 
@@ -190,16 +195,15 @@ void main()
         {
             if (x > 0)
             {
-                stringliteral = stringinorout(stringliteral, charliteral, program[y][x], program[y][x - 1], weare__acomment); // Keep track of whether we're in a string literal
-            printf("DEBUG line %d: program[%d][%d] is %c, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, y, x, program[y][x],stringliteral, charliteral, weare__acomment, weare__asinglelinecomment);                                                                                 /*DEBUGOUTPUT*/
-
+                areweinastring = stringinorout(stringliteral, charliteral, program[y][x], program[y][x - 1], weare__acomment);                                                                                                                                                                 // Keep track of whether we're in a string literal
+                printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, y, x, program[y][x], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment); /*DEBUGOUTPUT*/
             }
 
             /*count each character per line, iterate upwards*/
             if (((program[y][x] == '/') && (program[y][x + 1] == '/')) && weare__acomment == OUT)
-            {             /*we're in a comment, ignore*/
+            {                                   /*we're in a comment, ignore*/
                 weare__asinglelinecomment = IN; /*we are in a single line comment*/
-                break;    /*go to the next line and go from there, nothing to see here*/
+                break;                          /*go to the next line and go from there, nothing to see here*/
             }
             else if ((program[y][x] == '/') && (program[y][x + 1] == '*')) /*we're in a comment, skip over*/
                 weare__acomment = IN;
@@ -226,7 +230,7 @@ void main()
                 }
             }
 
-            while ((weare__acomment == OUT) && (stringliteral == OUT))
+            while ((weare__acomment == OUT) && (areweinastring == OUT))
             {
                 if (program[y][x] == '(') /*if we have an open parenthesis*/
                 {
@@ -235,11 +239,11 @@ void main()
                     {
                         maxparenthesis = p;
                     }
-                    location_popen_column[p] = x;                                                                                                                                                                                         /*register that the nth parenthesis' that's opened column location is x*/
-                    location_popen_line[p] = y;                                                                                                                                                                                           /*register that the nth parenthesis' line location is y */
-                    printf("DEBUG line %d:%c is program[%d][%d]\n", __LINE__, program[y][x], y, x);                                                                                                                                       /*debugoutput*/
-                    printf("DEBUG line %d:%c is program[location_popen_line[%d]][location_popen_column[%d]] %c is program[%d][%d] \n\n", __LINE__, program[location_popen_line[p]][location_popen_column[p]], p, p, program[y][x], y, x); /*debugoutput*/
-                    p++;                                                                                                                                                                                                                  /*iterate p up so that the next time we see an open parenthesis, it is seen as the 2nd, 3rd, 4th, etc.*/
+                    location_popen_column[p] = x;                                                                                                                                                                                                      /*register that the nth parenthesis' that's opened column location is x*/
+                    location_popen_line[p] = y;                                                                                                                                                                                                        /*register that the nth parenthesis' line location is y */
+                    printf("DEBUG line %d:%c is program[%d][%d]\n", __LINE__, program[y][x], y, x);                                                                                                                                                    /*debugoutput*/
+                    printf("DEBUG line %d:%d is p , %c is program[location_popen_line[%d]][location_popen_column[%d]] %c is program[%d][%d] \n\n", __LINE__, p, program[location_popen_line[p]][location_popen_column[p]], p, p, program[y][x], y, x); /*debugoutput*/
+                    p++;                                                                                                                                                                                                                               /*iterate p up so that the next time we see an open parenthesis, it is seen as the 2nd, 3rd, 4th, etc.*/
                     break;
                 }
                 else if (program[y][x] == ')') /*if we have a closed parenthesis*/
@@ -247,7 +251,7 @@ void main()
 
                     p--; /*iterate p down so that we are closing the last parenthesis we opened. */
 
-                     if (p < 0)
+                    if (p < 0)
                     {
                         extra_closed_parenthesis[(-p)]++;
                     }
@@ -259,11 +263,10 @@ void main()
                     location_pclose_column[p] = x; /*register that the nth parenthesis' that's closed column location is x*/
                     location_pclose_line[p] = y;   /*register that the nth parenthesis' that's closed location is y */
 
-                    printf("DEBUG line %d:  %d is y, %d is x, %d is p, %d is location_pclose_line[%d]\n\n", __LINE__, y, x, p, location_pclose_line[p], p);                                                                                 /*DEBUGOUTPUT*/
-                    printf("DEBUG line %d:%c is program[%d][%d]\n", __LINE__, program[y][x], y, x);                                                                                                                                       /*debugoutput*/
-                    printf("DEBUG line %d:%c is program[location_pclose_line[%d]][location_pclose_column[%d]] %c is program[%d][%d] \n\n", __LINE__, program[location_pclose_line[p]][location_pclose_column[p]], p, p, program[y][x], y, x); /*debugoutput*/
+                    printf("DEBUG line %d:  %d is y, %d is x, %d is p, %d is location_pclose_line[%d]\n\n", __LINE__, y, x, p, location_pclose_line[p], p);                                                                                               /*DEBUGOUTPUT*/
+                    printf("DEBUG line %d:%c is program[%d][%d]\n", __LINE__, program[y][x], y, x);                                                                                                                                                       /*debugoutput*/
+                    printf("DEBUG line %d:%d is p, %c is program[location_pclose_line[%d]][location_pclose_column[%d]] %c is program[%d][%d] \n\n", __LINE__, p, program[location_pclose_line[p]][location_pclose_column[p]], p, p, program[y][x], y, x); /*debugoutput*/
 
-                   
                     break;
                 }
                 else
@@ -294,10 +297,11 @@ void main()
         { /*location_popen_column[whichp] = what you need to iterate location_popen_line[whichp] = the line you are now on */ /* program[location_popen_line[whichp]][location_popen_column[whichp]] = the character where you are right now*/
             for (int charsforcontext = (location_popen_column[whichp] >= 10 ? location_popen_column[whichp] - 10 : 0); charsforcontext < (location_popen_column[whichp] <= MAXCHARS - 11 ? location_popen_column[whichp] + 10 : MAXCHARS - 1); charsforcontext++)
             {
-                printf("%c",program[location_popen_line[whichp]][charsforcontext]);
-//debug printf("%c is program[%d][%d] %d is y\n\n", program[location_popen_line[whichp]][charsforcontext], location_popen_line[whichp], charsforcontext, charsforcontext);
+                printf("%c", program[location_popen_line[whichp]][charsforcontext]);
+                // debug printf("%c is program[%d][%d] %d is y\n\n", program[location_popen_line[whichp]][charsforcontext], location_popen_line[whichp], charsforcontext, charsforcontext);
             }
             printf("\n"); /*make it neat*/
         }
     }
-printf("\n\n");}
+    printf("\n\n");
+}
