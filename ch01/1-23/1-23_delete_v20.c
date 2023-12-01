@@ -388,7 +388,7 @@ void main()
 
     printarray(nocomment, linecountoutput);
 
-    for (int z = 0; x < linecountinput; z++) /*this writes the processed output without comments to my file I specified*/
+    for (int z = 0; z < linecountinput; z++) /*this writes the processed output without comments to my file I specified*/
     {
         fprintf(savefilenocomments, "%s", nocomment[z]);
     }
