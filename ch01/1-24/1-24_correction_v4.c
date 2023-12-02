@@ -27,8 +27,8 @@ first parenthesis. When an ( is found, parenthesis[0]++ will occur, which brings
 parenthesis[0]-- will happen, which brings it to a 0. If any of these is a 1, or a negative one,
 it means that parenthesis is out of balance, and should be looked at. Same for arrays for other character types */
 
-int parencount = 0;                       /*parencount stores which parenthesis we are on*/
-int maxparenthesis = 0;                   /*the highest number of parenthesis we opened as we count up*/
+int parencount = 0;                             /*parencount stores which parenthesis we are on*/
+int maxparenthesis = 0;                         /*the highest number of parenthesis we opened as we count up*/
 int parenthesis[MAXCHARS] = {0};                /*array for storing whether parenthesis are balanced - should ++ when there is an open parenthesis, and -- when there is a closed parenthesis*/
 int extra_closed_parenthesis[MAXCHARS] = {0};   /*array for storing how many extra closed parenthesis there are*/
 int location_parenopen_column[MAXCHARS] = {0};  /*array for storing column of opening parenthesis*/
@@ -36,17 +36,17 @@ int location_parenopen_line[MAXLINES] = {0};    /*array for storing line of open
 int location_parenclose_column[MAXCHARS] = {0}; /*array for storing column of closing parenthesis*/
 int location_parenclose_line[MAXLINES] = {0};   /*array for storing column of closing parenthesis*/
 
-int curlycount = 0;                       /*curlycount stores which curly braces we are on*/
-int maxcurly = 0;                         /*the highest number of curly braces we opened as we count up*/
+int curlycount = 0;                             /*curlycount stores which curly braces we are on*/
+int maxcurly = 0;                               /*the highest number of curly braces we opened as we count up*/
 int curlybraces[MAXCHARS] = {0};                /*array for storing whether curly braces are balanced - should ++ when there is an open curly brace, and -- when there is a closed curlybrace*/
 int extra_closed_curlybraces[MAXCHARS] = {0};   /*array for storing how many extra closed curly braces there are*/
 int location_curlyopen_column[MAXCHARS] = {0};  /*array for storing column of opening curly braces*/
 int location_curlyopen_line[MAXLINES] = {0};    /*array for storing line of opening curly braces*/
 int location_curlyclose_column[MAXCHARS] = {0}; /*array for storing column of closing curly braces*/
-int location_curlyclose_line[MAXLINES] = {0};  /*array for storing column of closing curly braces*/
+int location_curlyclose_line[MAXLINES] = {0};   /*array for storing column of closing curly braces*/
 
-int bracketcount = 0;                       /*bracketcount stores which brackets we are on*/
-int maxbracket = 0;                         /*the highest number of brackets we opened as we count up*/
+int bracketcount = 0;                             /*bracketcount stores which brackets we are on*/
+int maxbracket = 0;                               /*the highest number of brackets we opened as we count up*/
 int brackets[MAXCHARS] = {0};                     /*array for storing whether brackets are balanced - should ++ when there is an open bracket brace, and -- when there is a closed bracketbrace*/
 int extra_closed_brackets[MAXCHARS] = {0};        /*array for storing how many extra closed brackets there are*/
 int location_bracketopen_column[MAXCHARS] = {0};  /*array for storing column of opening brackets*/
@@ -54,14 +54,14 @@ int location_bracketopen_line[MAXLINES] = {0};    /*array for storing line of op
 int location_bracketclose_column[MAXCHARS] = {0}; /*array for storing column of closing brackets*/
 int location_bracketclose_line[MAXLINES] = {0};   /*array for storing column of closing brackets*/
 
-int quotecount = 0;                       /*quotecount stores which quotes we are on*/
-int maxquote = 0;                         /*the highest number of quotes we opened as we count up*/
-int quotes[MAXCHARS] = {0};                    /*array for storing whether quotes are balanced - should ++ when there is an open quote, and -- when there is a closed quote*/
-int extra_closed_quotes[MAXCHARS] = {0};       /*array for storing how many extra closed quotes there are*/
+int quotecount = 0;                             /*quotecount stores which quotes we are on*/
+int maxquote = 0;                               /*the highest number of quotes we opened as we count up*/
+int quotes[MAXCHARS] = {0};                     /*array for storing whether quotes are balanced - should ++ when there is an open quote, and -- when there is a closed quote*/
+int extra_closed_quotes[MAXCHARS] = {0};        /*array for storing how many extra closed quotes there are*/
 int location_quoteopen_column[MAXCHARS] = {0};  /*array for storing column of opening quotes*/
-int location_quoteopen_line[MAXLINES] = {0};   /*array for storing line of opening quotes*/
+int location_quoteopen_line[MAXLINES] = {0};    /*array for storing line of opening quotes*/
 int location_quoteclose_column[MAXCHARS] = {0}; /*array for storing column of closing quotes*/
-int location_quoteclose_line[MAXLINES] = {0};  /*array for storing column of closing quotes*/
+int location_quoteclose_line[MAXLINES] = {0};   /*array for storing column of closing quotes*/
 
 int amibreakingmyloop = IN;
 
@@ -72,10 +72,10 @@ int trackchars(char openchar, char closechar, int ifthisis0youclosedit[], int co
                int maxcount, int opencolumn[], int openline[], int closecolumn[],
                int closeline[], int extraclosedtrackingarray[], int columninsidefunction, int lineinsidefunction)
 {
-    printf("debug line %d before if in function, what does it think program[line][column] which is program[%d][%d] is: it's %c \n", __LINE__, line, column, program[lineinsidefunction][columninsidefunction]); 
+    printf("debug line %d before if in function, what does it think program[line][column] which is program[%d][%d] is: it's %c \n", __LINE__, line, column, program[lineinsidefunction][columninsidefunction]);
     if (program[lineinsidefunction][columninsidefunction] == openchar) /*if we have an open character*/
     {
-        printf("debug line %d inside first if in function, if you see parenthesis open\n", __LINE__); 
+        printf("debug line %d inside first if in function, if you see parenthesis open\n", __LINE__);
         ifthisis0youclosedit[counter]++; /*count up in the array for that character, the number of open characters we're on. */
         if (maxcount < counter)          /*keep track of the highest number parenthesis ever hit so we know how far to print at the end*/
         {
@@ -91,7 +91,7 @@ int trackchars(char openchar, char closechar, int ifthisis0youclosedit[], int co
     }
     else if (program[lineinsidefunction][columninsidefunction] == closechar) /*if we have a closed char */
     {
-        printf("debug line %d inside second else if in function, if you see parenthesis close\n", __LINE__); 
+        printf("debug line %d inside second else if in function, if you see parenthesis close\n", __LINE__);
         counter--; /*iterate counter down so that we are closing the last char we opened. */
 
         if (counter < 0)
@@ -114,7 +114,8 @@ int trackchars(char openchar, char closechar, int ifthisis0youclosedit[], int co
         return OUT; /*break out of the while loop I am running this under*/
     }
     else
-    {        printf("debug line %d ending else in function\n", __LINE__); 
+    {
+        printf("debug line %d ending else in function\n", __LINE__);
 
         return IN; /*end this function*/
     }
@@ -315,6 +316,31 @@ void main()
 
             areweinastring = stringinorout(stringliteral, charliteral, program[line][column], program[line][column - 1], weare__acomment);                                                                                                                                                                 // Keep track of whether we're in a string literal
             printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, line, column, program[line][column], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment); /*DEBUGOUTPUT*/
+            if (weare__acomment == IN)
+            {
+                while (weare__acomment == IN) /*this is for when we are still in a multiline comment as we enter a new line. find the end of the comment!*/
+                {
+                    if ((program[line][column] == '*') && (program[line][column + 1] == '/') && (areweinastring == OUT))
+                    {
+                        if (column < MAXCHARS - 3)
+                        {
+                            column = column + 2; /*skip past the comment*/
+                        }
+                        weare__acomment = OUT; /*mark us as OUT of a comment*/
+                    }
+                    else
+                    {
+                        if (column < MAXCHARS - 3)
+                        {
+                            column++; /*keep moving forward*/
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
 
             /*count each character per line, iterate upwards*/
             if (((program[line][column] == '/') && (program[line][column + 1] == '/')) && ((weare__acomment == OUT)) && (areweinastring == OUT))
@@ -351,11 +377,11 @@ void main()
 
             while ((weare__acomment == OUT) && (areweinastring == OUT))
             {
-                
+
                 amibreakingmyloop = trackchars('(', ')', parenthesis, parencount, maxparenthesis, location_parenopen_column,
-                                               location_parenopen_line, location_parenclose_column, location_parenclose_line, 
+                                               location_parenopen_line, location_parenclose_column, location_parenclose_line,
                                                extra_closed_parenthesis, column, line);
-                
+
                 if (amibreakingmyloop == OUT)
                 {
                     break;

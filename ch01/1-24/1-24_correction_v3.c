@@ -214,7 +214,7 @@ void main()
             printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, line, column, program[line][column], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment); /*DEBUGOUTPUT*/
             if (weare__acomment == IN)
             {
-                while (weare__acomment == IN)
+                while (weare__acomment == IN) /*this is for when we are still in a multiline comment as we enter a new line. find the end of the comment!*/
                 {
                     if ((program[line][column] == '*') && (program[line][column + 1] == '/') && (areweinastring == OUT))
                     {
