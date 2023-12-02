@@ -30,6 +30,10 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
     putting a \ at the end of a line, escaping the newline character and tricking my 
     program into thinking we are automatically out of a string because we hit enter on a 
     newline. */
+
+    /* a little bit of 
+    ( (((( trolling 
+*/
     if ((currentchar == '\n') && (previouschar == '\\') && weare__acomment == OUT)
     {
         didweescapenewline = YES;
@@ -95,7 +99,7 @@ FILE *openfile()
     { /*error handling if it cannot open the file*/
         perror("Error opening file");
         fclose(program);
-    }
+    } 
     else
     {
         printf("%p is open, that's filename: %s\n\n", (void *)program, inputfilename); /*tell me the file as a memory address & filename if it did open*/
