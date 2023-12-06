@@ -8,3 +8,5 @@ I added a bunch of updates, wherewefail.md is where I need to pick up from when 
 
 I tried with `1-24_correction_v4.c` to make a function. However, according to my debugoutput, when I pass the line & column of my program array to my function to check whether it is a ( or a ), it thinks I am always at 0. Regardless of the actual value of line & column, my debugoutput shows line & column being 0. I have 0 initialized all of my arrays and made sure they're not out of bounds. I don't know what I am missing. :( 
 edit: I declared line & column twice. I started thinking about this as I fell asleep and figured it out and woke up to fix it. Fun!
+
+We will come back to this and win soon. :) 
