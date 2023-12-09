@@ -10,3 +10,5 @@ I tried with `1-24_correction_v4.c` to make a function. However, according to my
 edit: I declared line & column twice. I started thinking about this as I fell asleep and figured it out and woke up to fix it. Fun!
 
 We will come back to this and win soon. :) 
+
+`1-24_correction_v5.c` seeks to turn the process of finding () [] and {} into a function. I will make header files and separate this out once I have functions for everything so my normal code is neater. 
