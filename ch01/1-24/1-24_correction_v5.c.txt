@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-// commented out debug output on line 83, 93, 95, 116, 120, 129, 139, 141, 162, 166, 188, 191, 211, 212, 216, 410
+// commented out debug output on line 83, 93, 95, 116, 120, 129, 139, 141, 162, 166, 190, 210, 407
 #define MAXCHARS 1000
 #define MAXLINES 1000
 #define MAXFILENAME 100
@@ -407,7 +407,7 @@ void main()
         {
 
             areweinastring = stringinorout(stringliteral, charliteral, program[line][column], program[line][column - 1], weare__acomment); // Keep track of whether we're in a string literal
-                                                                                                                                           //  printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d, parencount/counter is %d, extra_closed_parenthesis[%d] is %d\n", __LINE__, line, column, program[line][column], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment, parencount, abs(parencount), extra_closed_parenthesis[abs(parencount)]); //DEBUGOUTPUT
+      //  printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d, parencount/counter is %d, extra_closed_parenthesis[%d] is %d\n", __LINE__, line, column, program[line][column], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment, parencount, abs(parencount), extra_closed_parenthesis[abs(parencount)]); //DEBUGOUTPUT
             if (weare__acomment == IN)
             {
                 while (weare__acomment == IN) // this is for when we are still in a multiline comment as we enter a new line. find the end of the comment!
