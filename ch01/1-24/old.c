@@ -1,6 +1,4 @@
 #include <stdio.h>
-#include <stdlib.h>
-
 #define MAXCHARS 1000
 #define MAXLINES 1000
 #define MAXFILENAME 100
@@ -24,25 +22,21 @@ int weare__acomment = OUT;           /*keep track of whether we're in a comment*
 int weare__asinglelinecomment = OUT; /*keep track of whether we're on a single comment so we can reset it on the next line*/
 int didweescapenewline = NO;
 
-/*theparenthesis_open_status] array keeps track of whether parenthesis are balanced. letparenthesis_open_status0] be the
-first parenthesis. When an ( is found,parenthesis_open_status0]++ will occur, which brings it to 1. If a ) shows up,
+/*the parenthesis[] array keeps track of whether parenthesis are balanced. let parenthesis[0] be the
+first parenthesis. When an ( is found, parenthesis[0]++ will occur, which brings it to 1. If a ) shows up,
 parenthesis[0]-- will happen, which brings it to a 0. If any of these is a 1, or a negative one,
 it means that parenthesis is out of balance, and should be looked at. Same for arrays for other character types */
 
-int paren_open_count = 0;                       /*paren_open_count stores which parenthesis we are on*/
-int paren_close_count = 0;                      /*paren_open_count stores which EXCESS closed parenthesis we are on*/
-int max_open_parenthesis = 0;                   /*the highest number of parenthesis we opened as we count up*/
-int max_closed_parenthesis = 0;                 /*the highest number of EXCESS closed parenthesis */
-int parenthesis_open_status[MAXCHARS] = {0};    /*array for storing whether parenthesis are balanced - should ++ when there is an open parenthesis, and -- when there is a closed parenthesis*/
-int parenthesis_closed_status[MAXCHARS] = {0};  /*array for storing how many extra closed parenthesis there are*/
-int location_parenopen_line[MAXLINES] = {0};    /*array for storing line of opening parenthesis*/
+int parencount = 0;                             /*parencount stores which parenthesis we are on*/
+int maxparenthesis = 0;                         /*the highest number of parenthesis we opened as we count up*/
+int parenthesis[MAXCHARS] = {0};                /*array for storing whether parenthesis are balanced - should ++ when there is an open parenthesis, and -- when there is a closed parenthesis*/
+int extra_closed_parenthesis[MAXCHARS] = {0};   /*array for storing how many extra closed parenthesis there are*/
 int location_parenopen_column[MAXCHARS] = {0};  /*array for storing column of opening parenthesis*/
-int location_parenclose_line[MAXLINES] = {0};   /*array for storing column of closing parenthesis*/
+int location_parenopen_line[MAXLINES] = {0};    /*array for storing line of opening parenthesis*/
 int location_parenclose_column[MAXCHARS] = {0}; /*array for storing column of closing parenthesis*/
-int parenthesis_balanced = YES;
+int location_parenclose_line[MAXLINES] = {0};   /*array for storing column of closing parenthesis*/
 
-int curlycount = 0; /*curlycount stores which curly braces we are on*/
-int curlyclosecount = 0;
+int curlycount = 0;                             /*curlycount stores which curly braces we are on*/
 int maxcurly = 0;                               /*the highest number of curly braces we opened as we count up*/
 int curlybraces[MAXCHARS] = {0};                /*array for storing whether curly braces are balanced - should ++ when there is an open curly brace, and -- when there is a closed curlybrace*/
 int extra_closed_curlybraces[MAXCHARS] = {0};   /*array for storing how many extra closed curly braces there are*/
@@ -51,8 +45,7 @@ int location_curlyopen_line[MAXLINES] = {0};    /*array for storing line of open
 int location_curlyclose_column[MAXCHARS] = {0}; /*array for storing column of closing curly braces*/
 int location_curlyclose_line[MAXLINES] = {0};   /*array for storing column of closing curly braces*/
 
-int bracketcount = 0; /*bracketcount stores which brackets we are on*/
-int bracketclosecount = 0;
+int bracketcount = 0;                             /*bracketcount stores which brackets we are on*/
 int maxbracket = 0;                               /*the highest number of brackets we opened as we count up*/
 int brackets[MAXCHARS] = {0};                     /*array for storing whether brackets are balanced - should ++ when there is an open bracket brace, and -- when there is a closed bracketbrace*/
 int extra_closed_brackets[MAXCHARS] = {0};        /*array for storing how many extra closed brackets there are*/
@@ -61,8 +54,7 @@ int location_bracketopen_line[MAXLINES] = {0};    /*array for storing line of op
 int location_bracketclose_column[MAXCHARS] = {0}; /*array for storing column of closing brackets*/
 int location_bracketclose_line[MAXLINES] = {0};   /*array for storing column of closing brackets*/
 
-int quotecount = 0; /*quotecount stores which quotes we are on*/
-int quoteclosecount = 0;
+int quotecount = 0;                             /*quotecount stores which quotes we are on*/
 int maxquote = 0;                               /*the highest number of quotes we opened as we count up*/
 int quotes[MAXCHARS] = {0};                     /*array for storing whether quotes are balanced - should ++ when there is an open quote, and -- when there is a closed quote*/
 int extra_closed_quotes[MAXCHARS] = {0};        /*array for storing how many extra closed quotes there are*/
@@ -71,131 +63,64 @@ int location_quoteopen_line[MAXLINES] = {0};    /*array for storing line of open
 int location_quoteclose_column[MAXCHARS] = {0}; /*array for storing column of closing quotes*/
 int location_quoteclose_line[MAXLINES] = {0};   /*array for storing column of closing quotes*/
 
+int amibreakingmyloop = IN;
+
 // FUNCTION FOR KEEPING TRACK OF SOMETHING
-// COUNTING & KEEPING TRACK OF EXCESS OPENING CHARACTERS
-void trackopenedchars(char openchar, char closechar,
-                      int *opencounter, int *closecounter,
-                      int *max_open, int *max_close, int openstatus[],
-                      int openline[], int opencolumn[],
-                      int closestatus[], int *BALANCED)
+
+// COUNTING & KEEPING TRACK OF PARENTHESIS
+int trackchars(char openchar, char closechar, int ifthisis0youclosedit[], 
+int counter, int maxcount, int opencolumn[], int openline[], 
+int closecolumn[], int closeline[], int extraclosedtrackingarray[])
 {
-    printf("debug line %d before if in function, program[%d][%d] is %c \n", __LINE__, line, column, program[line][column]);
+    printf("debug line %d before if in function, what does it think program[line][column] which is program[%d][%d] is: it's %c \n", __LINE__, line, column, program[line][column]);
     if (program[line][column] == openchar) /*if we have an open character*/
     {
-        openstatus[*opencounter]++;   /*count up in the array for that character, the number of open characters we're on. */
-        if (*max_open < *opencounter) /*keep track of the highest number parenthesis ever hit so we know how far to print at the end*/
+        ifthisis0youclosedit[counter]++; /*count up in the array for that character, the number of open characters we're on. */
+        if (maxcount < counter)          /*keep track of the highest number parenthesis ever hit so we know how far to print at the end*/
         {
-            *max_open = *opencounter;
+            maxcount = counter;
         }
-        opencolumn[*opencounter] = column; /*store the column coordinate of the nth opened char in the location array*/
-        openline[*opencounter] = line;     /*store the line coordinate of the nth opened char in the location array*/
-        printf("DEBUG %d OPEN %c FOUND: *opencounter is %d, openstatus[%d] is %d, program[%d][%d] is %c \n\n",
-               __LINE__, openchar, *opencounter, *opencounter, openstatus[*opencounter], openline[*opencounter], opencolumn[*opencounter],
-               program[openline[*opencounter]][opencolumn[*opencounter]]);
-        (*opencounter)++; /*iterate p up so that the next time we see an open parenthesis, it is seen as the 2nd, 3rd, 4th, etc.*/
-        printf("DEBUG %d did *opencounter go up after detecting an opening parenthesis? *opencounter is %d\n\n",
-               __LINE__, *opencounter);
+        opencolumn[counter] = column; /*store the column coordinate of the nth opened char in the location array*/
+        openline[counter] = line;     /*store the line coordinate of the nth opened char in the location array*/
+        printf("DEBUG %d OPEN %c FOUND: counter is %d, program[%d][%d] is %c \n\n",
+               __LINE__, openchar, counter, openline[counter], opencolumn[counter], 
+               program[openline[counter]][opencolumn[counter]]);
+        counter++;  /*iterate p up so that the next time we see an open parenthesis, it is seen as the 2nd, 3rd, 4th, etc.*/
+        return OUT; /*break out of the while loop I am running this under*/
     }
     else if (program[line][column] == closechar) /*if we have a closed char */
     {
-        if (!(*opencounter < 0))
-        {
-            *BALANCED = YES;
-            (*opencounter)--; /*iterate *opencounter down so that we are closing the last char we opened. */
+        counter--; /*iterate counter down so that we are closing the last char we opened. */
 
-            openstatus[*opencounter]--; /*count down in the tracking array for the number char we are on*/
-        } 
+        if (counter < 0)
+        {
+            extraclosedtrackingarray[(-counter)]++;
+        }
         else
         {
-            *BALANCED = NO;
+            ifthisis0youclosedit[counter]--; /*count down in the tracking array for the number char we are on*/
         }
-    }
 
+        closecolumn[counter] = column; /*store the column coordinate of the nth closed char in the location array*/
+        closeline[counter] = line;     /*store the line coordinate of the nth closed char in the location array*/
+
+        printf("DEBUG %d CLOSED %c FOUND: counter is %d, program[%d][%d] is %c \n\n",
+               __LINE__, closechar, counter, closeline[counter], closecolumn[counter], 
+               program[closeline[counter]][closecolumn[counter]]);
+
+        return OUT; /*break out of the while loop I am running this under*/
+    }
     else
     {
         printf("debug line %d ending else in function\n", __LINE__);
-    }
-}
 
-// COUNTING & KEEPING TRACK OF EXCESS CLOSING CHARACTERS
-
-void trackclosedchars(char openchar, char closechar, int *opencounter, int *closecounter,
-                      int *max_close, int closestatus[],
-                      int closeline[], int closecolumn[], int *BALANCED)
-{
-    printf("debug line %d before if in function, program[%d][%d] is %c \n", __LINE__, line, column, program[line][column]);
-    if ((program[line][column] == closechar) && (*BALANCED == NO)) /*if we have a closed character AND our parenthesis aren't balanced*/
-    {
-        closestatus[*closecounter]++;   /*count up in the array for that character, the number of open characters we're on. */
-        if (*max_close < *closecounter) /*keep track of the highest number parenthesis ever hit so we know how far to print at the end*/
-        {
-            *max_close = *closecounter;
-        }
-        closecolumn[*closecounter] = column; /*store the column coordinate of the nth opened char in the location array*/
-        closeline[*closecounter] = line;     /*store the line coordinate of the nth opened char in the location array*/
-        printf("DEBUG %d CLOSE %c FOUND: *closecounter is %d, closestatus[%d] is %d, program[%d][%d] is %c \n\n",
-               __LINE__, closechar, *closecounter, *closecounter, closestatus[*closecounter], closeline[*closecounter], closecolumn[*closecounter],
-               program[closeline[*closecounter]][closecolumn[*closecounter]]);
-        (*closecounter)++; /*iterate closecounter up so that the next time we see a closechar, it is seen as the 2nd, 3rd, 4th, etc.*/
-        printf("DEBUG %d did *closecounter go up after detecting a closechar? *closecounter is %d\n\n",
-               __LINE__, *closecounter);
-    }
-    /* else if ((program[line][column] == openchar) && !(*opencounter < 0)) // if we have a OPEN char and we do not have an excess of open chars
-     {
-         (*closecounter)--; //iterate *closecounter down so that we are closing the last char we opened.
-
-         if (!(*closecounter < 0))
-         {
-             closestatus[*closecounter]--; // count down in the tracking array for the number char we are on
-         }
-     } */
-    else
-    {
-        printf("debug line %d ending else in function\n", __LINE__);
-    }
-}
-
-// FUNCTION TO PRINT THE LOCATION OF THE ERRORS IN SYNTAX OF CODE AFTER FINDING THEM
-
-void printerrors(int openstatus[], int max_open, int openline[], int opencolumn[],
-                 int closestatus[], int max_close, int closeline[], int closecolumn[])
-{
-
-    for (int whichp = 0; whichp <= max_open; whichp++)
-    {
-        if (openstatus[whichp] != 0)
-        {
-            printf("line with mismatched thing is probably the %dth thing on line %d: \n", whichp + 1, openline[whichp] + 1);
-            printf("%d debugoutput openstatus[%d] is %d\n", __LINE__, whichp, openstatus[whichp]);
-            /*location_parenopen_column[whichp] = what you need to iterate location_parenopen_line[whichp] = the line you are now on */ /* program[location_parenopen_line[whichp]][location_parenopen_column[whichp]] = the character where you are right now*/
-            for (int charsforcontext = (opencolumn[whichp] >= 10 ? opencolumn[whichp] - 10 : 0); charsforcontext < (opencolumn[whichp] <= MAXCHARS - 11 ? opencolumn[whichp] + 10 : MAXCHARS - 1); charsforcontext++)
-            {
-                printf("%c", program[openline[whichp]][charsforcontext]);
-            }
-            printf("\n"); /*make it neat*/
-        }
-    }
-    printf("\n\n");
-
-    for (int whichp = 0; whichp <= max_close; whichp++)
-    {
-        if (closestatus[whichp] != 0)
-        {
-            printf("line with extra closed thing is probably the %dth thing on line %d \n", whichp + 1, closeline[whichp] + 1);
-            printf("%d DEBUGOUTPUT closestatus[%d] is %d\n", __LINE__, whichp, closestatus[whichp]);
-            /*location_parenopen_column[whichp] = what you need to iterate location_parenopen_line[whichp] = the line you are now on */ /* program[location_parenopen_line[whichp]][location_parenopen_column[whichp]] = the character where you are right now*/
-            for (int charsforcontext = (closecolumn[whichp] >= 10 ? closecolumn[whichp] - 10 : 0); charsforcontext < (closecolumn[whichp] <= MAXCHARS - 11 ? closecolumn[whichp] + 10 : MAXCHARS - 1); charsforcontext++)
-            {
-                printf("%c", program[closeline[whichp]][charsforcontext]);
-            }
-            printf("\n"); /*make it neat*/
-        }
+        return IN; /*end this function*/
     }
 }
 
 // FUNCTION TO KEEP TRACK OF WHETHER WE ARE, OR ARE NOT, INSIDE OF A STRING, WHEN LOOKING FOR COMMENTS.
 
-int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int comment)
+int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, char previouschar, int weare__acomment)
 {
 
     static int escaped = NO;
@@ -214,21 +139,21 @@ int stringinorout(int keeptrackofstring, int keeptrackofchar, char currentchar, 
         escaped = NO;
     }
 
-    if ((currentchar == '\n') && (previouschar == '\\') && comment == OUT)
+    if ((currentchar == '\n') && (previouschar == '\\') && weare__acomment == OUT)
     {
         escaped = OUT;
         didweescapenewline = YES;
     }
 
     /* Handle strings in double quotes, only outside of comments */
-    if (currentchar == '\"' && !(comment == IN) && !(keeptrackofchar == IN) && !(escaped == YES))
+    if (currentchar == '\"' && !(weare__acomment == IN) && !(keeptrackofchar == IN) && !(escaped == YES))
     {
         keeptrackofstring = (keeptrackofstring == OUT) ? IN : OUT;
         stringliteral = keeptrackofstring;
     }
 
     /* Handle characters in single quotes, only outside of comments */
-    if (currentchar == '\'' && !(comment == IN) && !(keeptrackofstring == IN) && !(escaped == YES))
+    if (currentchar == '\'' && !(weare__acomment == IN) && !(keeptrackofstring == IN) && !(escaped == YES))
     {
         keeptrackofchar = (keeptrackofchar == OUT) ? IN : OUT;
         charliteral = keeptrackofchar;
@@ -370,8 +295,6 @@ void main()
 
             areweinastring = stringinorout(stringliteral, charliteral, program[line][column], program[line][column - 1], weare__acomment);                                                                                                                                                                 // Keep track of whether we're in a string literal
             printf("DEBUG line %d: program[%d][%d] is %c, areweinastring is %d, stringliteral is %d, charliteral is %d, comment is %d, singlelinecomment is %d\n", __LINE__, line, column, program[line][column], areweinastring, stringliteral, charliteral, weare__acomment, weare__asinglelinecomment); /*DEBUGOUTPUT*/
-            printf("CONTINUED: paren_open_count/opencounter is %d, paren_close_count/closecounter is %d, parenthesis_open_status[%d] is %d, parenthesis_close_status[%d] is %d\n", paren_open_count, paren_close_count, paren_open_count, parenthesis_open_status[paren_open_count], paren_close_count, parenthesis_closed_status[paren_close_count]);
-
             if (weare__acomment == IN)
             {
                 while (weare__acomment == IN) /*this is for when we are still in a multiline comment as we enter a new line. find the end of the comment!*/
@@ -430,73 +353,52 @@ void main()
                     }
                 }
             }
-            /* when not in a comment or a string, we check if the character is a (, ), [, ], {, }, and keep count of it!*/
-            if ((weare__acomment == OUT) && (areweinastring == OUT))
+
+            while ((weare__acomment == OUT) && (areweinastring == OUT))
             {
 
-                // track open parenthesis & count excess
-                trackopenedchars('(', ')',
-                                 &paren_open_count, &paren_close_count,
-                                 &max_open_parenthesis, &max_closed_parenthesis, parenthesis_open_status,
-                                 location_parenopen_line, location_parenopen_column,
-                                 parenthesis_closed_status, &parenthesis_balanced);
+                amibreakingmyloop = trackchars('(', ')', parenthesis, parencount, maxparenthesis, location_parenopen_column,
+                                               location_parenopen_line, location_parenclose_column, location_parenclose_line,
+                                               extra_closed_parenthesis);
 
-                // track closed parenthesis & count excess
-                trackclosedchars('(', ')', &paren_open_count, &paren_close_count,
-                                 &max_closed_parenthesis, parenthesis_closed_status,
-                                 location_parenclose_line, location_parenclose_column, &parenthesis_balanced);
+                if (amibreakingmyloop == OUT)
+                {
+                    break;
+                }
+                else
+                {
+                    break;
+                }
             }
         }
     }
 
-    printerrors(parenthesis_open_status, max_open_parenthesis, location_parenopen_line, location_parenopen_column,
-                parenthesis_closed_status, max_closed_parenthesis, location_parenclose_line, location_parenclose_column);
+    /*print parenthesis status at the end, along with some of what
+     was on the line with mismatched parenthesis so that a user
+     can find it more quickly*/
 
+    /*
+    for each parenthesis , we want to
+    1) check if it's a 0, meaning no fuckup.
+    2) if it isn't 0, that means that set of parenthesis is off balance.
+    3) print what is near the opening parenthesis on that line as well as the line number so
+    the programmer knows where to look for their bug. maxparenthesis is the max number of unclosed parenthesis
+    the user had open, and parenthesis[whichp] tells us if it is balanced(0 means closed)
+    */
+
+    for (int whichp = 0; whichp <= maxparenthesis; whichp++)
+    {
+        if (parenthesis[whichp] != 0)
+        {
+            printf("line with mismatched parenthesis is probably the %dth parenthesis on line %d: issue includes this text on line %d: ", whichp + 1, location_parenopen_line[whichp] + 1, location_parenopen_line[whichp] + 1);
+
+            /*location_parenopen_column[whichp] = what you need to iterate location_parenopen_line[whichp] = the line you are now on */ /* program[location_parenopen_line[whichp]][location_parenopen_column[whichp]] = the character where you are right now*/
+            for (int charsforcontext = (location_parenopen_column[whichp] >= 10 ? location_parenopen_column[whichp] - 10 : 0); charsforcontext < (location_parenopen_column[whichp] <= MAXCHARS - 11 ? location_parenopen_column[whichp] + 10 : MAXCHARS - 1); charsforcontext++)
+            {
+                printf("%c", program[location_parenopen_line[whichp]][charsforcontext]);
+            }
+            printf("\n"); /*make it neat*/
+        }
+    }
     printf("\n\n");
 }
-
-/* just experimenting
-
-MAXOPEN = 9
-
-CHARACTER   	( ( ( ( ( ( ) ) ) ( ) ) ) ) ( ) ( )
-ARRAYPOSITION	9 8 7 6 5 4 4 5 6 3 3 7 8 9 2 2 1 1
-OPENCOUNTER	    9 8 7 6 5 4       3         2   1
-CLOSECOUNTER	            0 1 2   3 4 5 6   7   8
-s
-
-                            maxopen - ((maxopen - opencounter) + closecounter)
-                            9 - (9 - 4) + (0)
-
-                              maxopen - ((maxopen - opencounter) + closecounter)
-                              9 - ( 9 - 4) + (1)
-
-                                        maxopen - ((maxopen - opencounter) + closecounter)
-                                        9 - (9 - 3) + 5
-
-                                      9 - (9 - 3) + 4
-/*
-
-we set opencounter equal to max_open after counting the entire doc
-
-1) we find each open parenthesis
-
-2) we iterate openstatus[opencounter]++
-
-3) we store openline[opencounter] = column
-
-4) we store opencolumn[opencounter] = line
-
-6) we iterate opencounter-- DOWN
-
-**edit this is not needed don't do this ** 7) LASTCHAR = OPEN //ADD VARIABLE FOR EACH CHARACTER TYPE TO TRACK THIS, USE BOOLEAN ** don't do this this is not needed **
-
-closecounter begins at 0
-
-1)if you see a closed one, closestatus[opencounter + closecounter]++
-** THIS IS NOT NEEDED DON'T DO THIS ANYMORE 2) LASTCHAR = CLOSE ** THIS IS NOT NEEDED DON'T DO THIS ANYMORE **
-
-3) we count up closecounter++ AFTER iterating the closestatus array up
-equal to closecounter[maxopen - ((maxopen - opencounter) + closecounter)]++.
-
-4)... this fails. it works sometimes, not others. fuck! */

@@ -1,0 +1,31 @@
+What is the name of the INPUT file you wish to check for imbalanced parenthesis?
+
+The filename you want me to open is failcode.c
+
+0x5572112316c0 is open, that's filename: failcode.c
+
+There's a mismatched ) on line 143: 
+
+ closechar)) // if w
+Look for the code above on line 143 and tell me if you find your problem with the location of the ) characters. 
+
+There's a mismatched } on line 360: 
+
+!= NULL) }}}
+
+Look for the code above on line 360 and tell me if you find your problem with the location of the } characters. 
+
+There's a mismatched } on line 386: 
+
+    }
+
+Look for the code above on line 386 and tell me if you find your problem with the location of the } characters. 
+
+There's a mismatched [ on line 201: 
+
+        [if (extra
+Look for the code above on line 201 and tell me if you find your problem with the location of the [ characters. 
+
+It looks like your " and " are balanced just fine! No errors here.
+
+

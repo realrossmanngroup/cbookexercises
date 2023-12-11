@@ -12,3 +12,9 @@ edit: I declared line & column twice. I started thinking about this as I fell as
 We will come back to this and win soon. :) 
 
 `1-24_correction_v5.c` seeks to turn the process of finding () [] and {} into a function. I will make header files and separate this out once I have functions for everything so my normal code is neater. 
+
+`1-24_correction_v6.c` is a meme. I tried to make it able to figure out exactly which parenthesis or bracket doesn't match even if you have extra in opening and closing. This drove me down a rabbit hole to hell that I spell out in `complete_rewrite_plan.md` which went nowhere other than a neverending brain teaser. 
+
+`1-24_correction_v5.c` is where I am leaving it at. If you have duplicated [ or ] or ( or ) or { or } or " or ", it'll tell you; and it'll try to guess the line it is on, and print out the characters in the area. Is it perfect... ? no. Does it cover more use cases than the code in the answer key of the book, and provide more useful output to the programmer? Absolutely. :D I was shocked when I finished this and saw how lame the answer key answer is. It doesn't even try to tell you where your error was at all.
+
+I was driving myself nuts trying to get it to perfectly figure out where your error was. and the book one doesn't do that at all. Ah well. Good learning! Chapter 1 can say goodbye. 
