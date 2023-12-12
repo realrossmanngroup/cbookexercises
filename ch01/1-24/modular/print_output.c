@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "print_output.h"
 #include "definitions.h"
 
 // FUNCTION TO PRINT THE LOCATION OF THE ERRORS IN SYNTAX OF CODE AFTER FINDING THEM
