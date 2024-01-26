@@ -2,26 +2,19 @@
 
 #define NONBLANK 'a'
 
-int main()
-
-{
-
+int main(void) {
+	
 	int c, prevchar;
-
 	prevchar = NONBLANK;
 
 	while ((c = getchar()) != EOF)
 	{
-		if (c == ' ' && prevchar != ' ')
-		{
-			putchar(c);
-			prevchar = c;
-			/*debug	printf("firstifworking"); */
+		if (c == ' ' && prevchar == ' ') {
+			continue;
 		}
-		else if (c != ' ')
-		{
-			putchar(c);
-			prevchar = c;
-	/*debug	printf("elseisworking"); */ }
+		
+		putchar(c);
+		prevchar = c;
+		/*debug	printf("elseisworking"); */ 
 	}
 }
