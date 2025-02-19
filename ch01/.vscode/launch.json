@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      {
+        "name": "Debug C Program with LLDB",
+        "type": "cppdbg",
+        "request": "launch",
+        "program": "${workspaceFolder}/build/Debug/outDebug",
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "stopAtEntry": false,
+        "externalConsole": false,
+        "MIMode": "lldb",
+        "miDebuggerPath": "/usr/bin/lldb-mi",
+        "preLaunchTask": "build C program"
+      }
+          },
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": false,
+      "cwd": "/home/louis/Documents/programming_practice/cbookexercises/ch01/1-06",
+      "program": "/home/louis/Documents/programming_practice/cbookexercises/ch01/1-06/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}

@@ -37,7 +37,9 @@ double main()
             INWORD = NO;
             ++wordcount[nc];
             if (wordcount[nc] > maxwords)
-            {
+            {wordcount[100]
+Now
+
                 maxwords = wordcount[nc];
             }
             if (maxlength < nc) /*make maxlength equal to charcount
