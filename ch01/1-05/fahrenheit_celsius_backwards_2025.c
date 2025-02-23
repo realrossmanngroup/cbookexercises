@@ -4,12 +4,12 @@ void main()
 {
     // create variabnles for each
     double fahr;
-    fahr = 0;
+    fahr = 300;
 
     //do calculation of celsius \
     from fahrenheit according to cels=(5/9(f -32))
     printf("Fahrenheit  Celsius\n\n");
-    for (fahr == 0; fahr <= 300; fahr = fahr + 20)
+    for (fahr == 300; fahr >= 0; fahr = fahr - 20)
     {
 
         printf("%8.2f %8.2f\n\n", fahr, ((5.0 / 9.0) * (fahr - 32)));
