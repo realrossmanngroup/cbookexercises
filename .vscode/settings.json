@@ -1,5 +1,16 @@
 {
     "files.associations": {
         "stdio.h": "c"
-    }
+    },
+    "editor.acceptSuggestionOnCommitCharacter": false,
+    "editor.quickSuggestions": {
+        "other": "off"
+    },
+    "editor.screenReaderAnnounceInlineSuggestion": false,
+    "terminal.integrated.suggest.quickSuggestions": false,
+    "emmet.showAbbreviationSuggestions": false,
+    "javascript.suggestionActions.enabled": false,
+    "typescript.suggestionActions.enabled": false,
+    "debug.console.historySuggestions": false,
+    "editor.suggest.selectionMode": "never"
 }
