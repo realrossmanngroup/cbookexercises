@@ -2,24 +2,31 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Compile and Run C",
+            "name": "gcc - Build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${fileDirname}/a.out",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
             "externalConsole": false,
             "MIMode": "gdb",
-            "preLaunchTask": "gcc compile",
             "setupCommands": [
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
                     "ignoreFailures": true
                 }
-            ]
+            ],
+            "preLaunchTask": "C/C++: gcc build active file",
+            "miDebuggerPath": "/usr/bin/gdb",
+            "internalConsoleOptions": "openOnFirstSessionStart",
+            "stopOnEntry": false,
+            "serverStarted": "Started debugging process",
+            "launchCompleteCommand": "exec-run",
+            "filterStderr": true,
+            "filterStdout": true
         }
     ]
 }
