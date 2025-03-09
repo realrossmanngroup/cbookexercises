@@ -17,6 +17,7 @@ void main()
     int count[101];       // stores how many words were typed for each word length
     int longestword = 0;  // length of longestword word
     int shortestword = 0; // length of shortestword word
+    int highestcount = 0; // what was the most time a word of a specific length was used
 
     // clear array for counting how many words for each wordlength to 0
 
@@ -94,32 +95,46 @@ void main()
 
     for (int x = 0; count[x] < 1; x++)
     {
-        shortestword = x;
+        shortestword = x + 1;
     }
 
+    // figure out highest count of a word of a specific length
+
+    for (int x = 0; x <= longestword; x++)
+    {
+        if (count[x] > highestcount)
+        {
+            highestcount = count[x];
+        }
+    }
     // create histogram
 
-    printf("wordlength");
+    printf("wordlength\n");
+
     for (int x = shortestword; x <= longestword; x++)
     {
 
-        printf("\t%4.0d ", x); // print legend for word length for y axis
+        printf("\t%4.0d |", x); // print legend for word length for y axis
 
-        /* print out a number of # equal to the count of count[x]
-
-        THINKING OUT LOUD HERE:
-
-        if i */
         for (int bar = 0; bar < count[x]; bar++)
         {
             printf("*  ");
         }
         printf("\n");
     }
+    // print separator between histogram and x axis legend
 
+    // for(int x = 0; x <= )
+
+    // print dashes between legend and graph on bottom axis
+    printf("\t ");
+    for (int bottomcount = 0; bottomcount <= highestcount; bottomcount++)
+    {
+        printf("___");
+    }
     // print legend for word count on x axis
-    printf("\t");
-    for (int bottomcount = 0; bottomcount <= longestword; bottomcount++)
+    printf("\n\t ");
+    for (int bottomcount = 0; bottomcount <= highestcount; bottomcount++)
     {
         printf("%3.0d", bottomcount);
     }
