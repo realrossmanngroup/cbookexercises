@@ -2,7 +2,7 @@
 
 #define MAXLINE 1000 /* maximum input line length */
 
-int getline(char line[], int maxline);
+int oldgetline(char line[], int maxline);
 void copy(char to[], char from[]);
 
 /* print the longest input line */
@@ -14,7 +14,7 @@ int main()
     char longest[MAXLINE]; /* longest line saved here */
 
     max = 0;
-    while ((len = getline(line, MAXLINE)) > 0)
+    while ((len = oldgetline(line, MAXLINE)) > 0)
     {
         if (len > max)
         {
@@ -24,27 +24,47 @@ int main()
     }
 
     if (max > 0) /* there was a line */
-        printf("%s", longest);
+        printf("\n%s\n\n", longest);
+    printf("the longest line was %d characters long\n\n", max);
 
     return 0;
 }
 
-/* getline: read a line into s, return length */
-int getline(char s[], int lim)
+/* oldgetline: read a line into s, return length */
+int oldgetline(char s[], int lim)
 {
     int c, i;
 
-    for (i = 0; i < lim - 1 && (c = getchar()) != EOF && c != '\n'; ++i)
-        s[i] = c;
+    for (i = 0; (c = getchar()) != EOF && c != '\n'; ++i)
+        /* logic to not keep adding stuff to the
+        char array s[] if we are close to its limit */
+        if (i < (lim - 2))
+        {
+            s[i] = c;
+            printf("\ns[i] = %c, i = %d, debug line %d\n", s[i], i, __LINE__);
+            if (c == '\n')
+            {
+                // debug
 
-    if (c == '\n')
-    {
-        s[i] = c;
-        ++i;
-    }
+                s[i] = c;
+                if (i < lim - 2)
+                {
+                    s[i + 1] = '\0';
+                }
+                printf("\ns[i] = %c, i = %d, debug line %d\n", s[i], i, __LINE__);
+            }
+        }
+        else
+        {
 
-    s[i] = '\0';
-    return i;
+            {
+                printf("\nc is %c, i = %d, debug line %d\n", c, i, __LINE__);
+
+                continue;
+            }
+
+            return i;
+        }
 }
 
 /* copy: copy 'from' into 'to'; assume to is big enough */
@@ -56,3 +76,13 @@ void copy(char to[], char from[])
     while ((to[i] = from[i]) != '\0')
         ++i;
 }
+
+/*This program cannot accept more than 4095
+characters. it tops out at that point and i can't
+figure out why it won't count past that point.
+the program successfully shows you as many characters 
+as possible from the longest line after you hit 
+enter with no text input, or ctrl-d to end the program.
+however, the program cannot count more than 4095 characters.
+the loop stops at that point. i hope i can figure this
+one out later on.*/
