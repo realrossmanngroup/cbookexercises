@@ -107,7 +107,99 @@ void main()
             highestcount = count[x];
         }
     }
-    // create histogram
+
+    // vertical histogram
+
+    for (int y = highestcount; y > 0; y--)
+    {
+
+        /*print "wordcount" next to y axis on bottom
+        horizontally if y axis is 9 or less. if y axis
+        is 9 or more, then print wordcount vertically*/
+        if (highestcount < 9)
+        {
+            if (y == 1)
+            {
+                printf("wordcount\t%3.0d | ", y);
+            }
+            else
+            {
+                printf("\t\t%3.0d | ", y);
+            }
+        }
+        else
+        {
+
+            if (y == 9)
+            {
+                printf("\tw\t%3.0d | ", y);
+            }
+            else if (y == 8)
+            {
+                printf("\to\t%3.0d | ", y);
+            }
+            else if (y == 7)
+            {
+                printf("\tr\t%3.0d | ", y);
+            }
+            else if (y == 6)
+            {
+                printf("\td\t%3.0d | ", y);
+            }
+            else if (y == 5)
+            {
+                printf("\tc\t%3.0d | ", y);
+            }
+            else if (y == 4)
+            {
+                printf("\to\t%3.0d | ", y);
+            }
+            else if (y == 3)
+            {
+                printf("\tu\t%3.0d | ", y);
+            }
+            else if (y == 2)
+            {
+                printf("\tn\t%3.0d | ", y);
+            }
+            else if (y == 1)
+            {
+                printf("\tt\t%3.0d | ", y);
+            }
+            else
+                printf("\t\t%3.0d | ", y);
+        }
+        for (int x = 1; x <= longestword; x++)
+        {
+            if (count[x] >= y)
+            {
+                printf("*  ");
+            }
+            else
+            {
+                printf("   ");
+            }
+        }
+        printf("\n");
+    }
+    // dashes between graph & x axis legend
+    printf("\t\t    ");
+    for (int bottomcount = 0; bottomcount < longestword; bottomcount++)
+    {
+        printf("___");
+    }
+
+    printf("\n\t\t ");
+
+    // x axis legend
+    for (int bottomcount = 0; bottomcount <= longestword; bottomcount++)
+    {
+        printf("%3.0d", bottomcount);
+    }
+    // label for x axis
+    printf("\n\n\t\t\twordlength\n\n");
+
+    /* create horizontal histogram
 
     // label for y axis
     printf("\n\b");
@@ -118,58 +210,58 @@ void main()
         {
             if (x < longestword)
             {
-                printf("\t\t%4.0d |", x);
+                printf("%4.0d |", x);
             }
             else
             {
-                printf("wordlength\t%4.0d |", x);
+                printf("wordlength%4.0d |", x);
             }
         } // if y is MORE than 10 we have enough space to type out "wordlength" vertically.
         else
         {
             if (x == (longestword - 9))
             {
-                printf("\tw\t%4.0d |", x);
+                printf("w%4.0d |", x);
             }
             else if (x == (longestword - 8))
             {
-                printf("\to\t%4.0d |", x);
+                printf("o%4.0d |", x);
             }
             else if (x == (longestword - 7))
             {
-                printf("\tr\t%4.0d |", x);
+                printf("r%4.0d |", x);
             }
             else if (x == (longestword - 6))
             {
-                printf("\td\t%4.0d |", x);
+                printf("d%4.0d |", x);
             }
             else if (x == (longestword - 5))
             {
-                printf("\tl\t%4.0d |", x);
+                printf("l%4.0d |", x);
             }
             else if (x == (longestword - 4))
             {
-                printf("\te\t%4.0d |", x);
+                printf("e%4.0d |", x);
             }
             else if (x == (longestword - 3))
             {
-                printf("\tn\t%4.0d |", x);
+                printf("n%4.0d |", x);
             }
             else if (x == (longestword - 2))
             {
-                printf("\tg\t%4.0d |", x);
+                printf("g%4.0d |", x);
             }
             else if (x == (longestword - 1))
             {
-                printf("\tt\t%4.0d |", x);
+                printf("t%4.0d |", x);
             }
             else if (x == (longestword))
             {
-                printf("\th\t%4.0d |", x);
+                printf("h%4.0d |", x);
             }
             else
             {
-                printf("\t\t%4.0d |", x);
+                printf("%4.0d |", x);
             }
         }
 
@@ -181,17 +273,18 @@ void main()
     }
 
     // dashes between graph & x axis legend
-    printf("\t\t      ");
+    printf("      ");
     for (int bottomcount = 0; bottomcount < highestcount; bottomcount++)
     {
         printf("___");
     }
     // x axis legend
-    printf("\n\t\t ");
+    printf("\n ");
     for (int bottomcount = 0; bottomcount <= highestcount; bottomcount++)
     {
         printf("%3.0d", bottomcount);
     }
     // label for x axis
-    printf("\n\n\t\t\twordcount\n\n");
+    printf("\n\nwordcount\n\n");
+*/
 }
