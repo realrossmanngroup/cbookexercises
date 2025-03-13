@@ -3,7 +3,6 @@
 #define MAXLINE 1000 /* maximum input line length */
 
 int oldgetline(char line[], int maxline);
-void reverse(char to[], char from[], int length);
 
 /* print the longest input line */
 int main()
@@ -17,7 +16,6 @@ int main()
     for (int x = 0; x < MAXLINE; x++)
     {
         line[x] = '\0';
-        backwards[x] = '\0';
     }
 
     while ((len = oldgetline(line, MAXLINE)) > 0)
@@ -25,9 +23,7 @@ int main()
         // debug
         // printf("\nlen = %d debug line %d\n", len, __LINE__);
 
-        reverse(backwards, line, len);
-
-        printf("%s\n\n", backwards);
+        printf("%s\n\n", line);
 
         // debug
         /*
@@ -50,18 +46,27 @@ int oldgetline(char s[], int lim)
     {
         /* logic to not keep adding stuff to the
         char array s[] if we are close to its limit */
-        if ((i < (lim - 2) && (c != '\n')))
+        if ((i < (lim - 2) && (c != '\n') && (c != '\t')))
         {
-            if (c != '\t')
-            {
-                s[i] = c;
-                // debug
-                // printf("\nfirst if ran\ns[%d] = %c, debug line %d\n", i, s[i], __LINE__);
-            }
-            else {
-            s[i] = '        '
-            }
+
+            s[i] = c;
+            // debug
+            // printf("\nfirst if ran\ns[%d] = %c, debug line %d\n", i, s[i], __LINE__);
         }
+
+        else if (c == '\t')
+        {
+            for (int tab8 = i; tab8 < (i + 8); ++tab8)
+            {
+                s[tab8] = ' ';
+                
+                //debug 
+                // printf("\n\ns[%d] = %c, s[%d] = %c, debug line %d\n\n",tab8, s[tab8], i, s[i],__LINE__);
+            }
+            i = i + 7;
+            continue;
+        }
+
         else if (c == '\n')
 
         {
@@ -93,47 +98,3 @@ int oldgetline(char s[], int lim)
     // printf("\ni = %d debug line %d", i, __LINE__);
     return i;
 }
-
-/*
-reverse: copy 'from' into 'to' while reversing, place
-null terminator manually at the end. we skip the null
-terminator while reversing since the null terminator
-represents the end of the string and it doesn't belong
-in the beginning!
-*/
-void reverse(char to[], char from[], int length)
-{
-    int reversed, original = 0;
-
-    for (reversed = (length - 1), original = 0; reversed == 0, original <= (length - 1); reversed--, original++)
-    {
-        to[reversed] = from[original];
-        // debug
-        // printf("\nto[%d] is %c from[%d] is %c debug line %d\n", reversed, to[reversed], original, from[original], __LINE__);
-    }
-
-    to[length] = '\0';
-}
-
-/*This program cannot accept more than 4095
-characters. it tops out at that point and i can't
-figure out why it won't count past that point.
-the program successfully shows you as many characters
-as possible from the longest line after you hit
-enter with no text input, or ctrl-d to end the program.
-however, the program cannot count more than 4095 characters.
-the loop stops at that point. i hope i can figure this
-one out later on.*/
-
-/*
-
-to do for exercise 1-19, using code from 1-16 as a base
-
-1. remove logic for figuring out longest line, unnecessary.
-
-2. get program to print each line after hitting enter rather
-than waiting for it to end
-
-3. figure out how to make reverse function
-
-*/
