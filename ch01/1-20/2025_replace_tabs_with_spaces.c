@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #define MAXLINE 1000 /* maximum input line length */
+#define TAB 8 
 
 int oldgetline(char line[], int maxline);
 
@@ -56,7 +57,7 @@ int oldgetline(char s[], int lim)
 
         else if (c == '\t')
         {
-            for (int tab8 = i; tab8 < (i + 8); ++tab8)
+            for (int tab8 = i; tab8 < (i + TAB); ++tab8)
             {
                 s[tab8] = ' ';
                 
