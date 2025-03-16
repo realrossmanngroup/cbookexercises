@@ -33,8 +33,9 @@ int main()
 int oldgetline(char s[], int lim)
 {
     int c, i;
+    i = 0;
 
-    for (i = 0; (c = getchar()) != EOF; ++i)
+    for (i = 0; ((c = getchar()) != EOF && (i < MAXLINE)); ++i)
     {
         /* logic to not keep adding stuff to the
         char array s[] if we are close to its limit */
@@ -48,13 +49,12 @@ int oldgetline(char s[], int lim)
         {
             blankcount++;
             s[i] = c;
-
             if (blankcount >= TAB)
             {
                 i = i - (TAB - 1); // go back to where first blank was
 
-                s[i] = '\t'; // insert tab where the first blank was
-                
+                s[i] = '\t';    // insert tab where the first blank was
+                blankcount = 0; // set blankcount back to 0.
                 // null the rest
                 for (int x = (i + 1); x < lim; x++)
                 {
