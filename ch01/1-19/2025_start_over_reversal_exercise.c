@@ -52,15 +52,9 @@ int oldgetline(char s[], int lim)
         char array s[] if we are close to its limit */
         if ((i < (lim - 2) && (c != '\n')))
         {
-            if (c != '\t')
-            {
-                s[i] = c;
-                // debug
-                // printf("\nfirst if ran\ns[%d] = %c, debug line %d\n", i, s[i], __LINE__);
-            }
-            else {
-            s[i] = '        '
-            }
+            s[i] = c;
+            // debug
+            // printf("\nfirst if ran\ns[%d] = %c, debug line %d\n", i, s[i], __LINE__);
         }
         else if (c == '\n')
 

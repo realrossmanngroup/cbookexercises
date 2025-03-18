@@ -23,3 +23,6 @@ int main() {
 This function still sucks because it requires the user to specify the length of the array to reverse a string, so that's what `1-19_external_variable+better_reverse.c` is for. This one has a proper reverse function that only requires 1 argument, the character array you are looking to reverse.
 
 Having 3 programs here is probably silly but I want to be able to look back at my progress later and remember struggling at this exercise so when I am smarter later I can smile at it. 
+
+
+`2025_start_over_reversal_exercise.c` is what I did when I started the book over in 2025 for fun.

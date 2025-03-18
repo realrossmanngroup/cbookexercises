@@ -1,22 +1,22 @@
 #include <stdio.h>
-#define MAXLINE 10000
+#define MAXLINELENGTH 10000
+#define RIGHTMARGIN 60
 
 int wordwrap(char s[], int linelength);
 
 void main()
 {
 
-    char typedinput[MAXLINE];
+    char typedinput[MAXLINELENGTH];
     int c, linelength;
     c = linelength = 0;
-    // printf("\n[%d] debug before while loop\n", __LINE__);
-    while (c != EOF)
-    { // loop until we end program
-        // printf("\n[%d] debug begin while loop\n", __LINE__);
 
-        for (int i = 0; (((c = getchar()) != EOF) && (i < MAXLINE)); i++)
+    while (c != EOF)
+    {
+
+        // take user input until they hit enter
+        for (int i = 0; (((c = getchar()) != EOF) && (i < MAXLINELENGTH)); i++)
         {
-            // printf("\n[%d] debug begin getchar; c is %c i is %d\n", __LINE__, c, i);
 
             if (c != '\n')
             {
@@ -28,13 +28,12 @@ void main()
                 typedinput[i] = '\0'; // put null terminator at end of line.
                 linelength = i;
 
-                // printf("\n[%d] debug newline end loop i is %d\n", __LINE__, i);
-                break; // leave loop on new line
+                break; // leave loop on  hitting enter
             }
         }
-        // printf("\n[%d] debug outside while before checking linelength which is %d\n", __LINE__, linelength);
 
-        if (linelength <= 60)
+        // print the line without doing any wrapping if it is within the margin
+        if (linelength <= RIGHTMARGIN)
         {
             printf("\n");
             for (int x = 0; x <= linelength; x++)
@@ -43,11 +42,11 @@ void main()
             }
             printf("\n");
         }
+        // word wrap the line if it goes past the margin
         else
         {
             printf("\n");
-            wordwrap(typedinput, linelength); // print everything wordwrapped
-            // repeat loop}
+            wordwrap(typedinput, linelength);
             printf("\n");
         }
     }
@@ -55,63 +54,60 @@ void main()
 
 int wordwrap(char s[], int linelength)
 {
-    // printf("\n[%d] debug print line at beginning of wordwrap when linelength = %d: %c\n", __LINE__, linelength, s[linelength - 2]);
 
     int beginning, end, breakpoint, line_number;
     beginning = 0;
-    end = 60;
+    end = RIGHTMARGIN;
     breakpoint = 0;
     line_number = 0;
 
-    while ((linelength - breakpoint) >= 60) // keep going until we are at the last line
+    // keep chopping away at
+    while ((linelength - breakpoint) >= RIGHTMARGIN) // keep going until we are at the last line
     {
-        // printf("\n[%d] inside while inside wordwrap linelength is %d\n", __LINE__, linelength);
 
-        for (int place_in_line = beginning; place_in_line <= (beginning + end); place_in_line++) // find breakpoint
+        // find a break point where we can splitt he line
+        for (int place_in_line = beginning; place_in_line <= (beginning + end); place_in_line++)
         {
             if ((s[place_in_line] == ' ') || (s[place_in_line] == '\t'))
             {
                 breakpoint = place_in_line;
             }
         }
-        // printf("\n[%d] debug  breakpoint counter ends at %d\n", __LINE__, breakpoint);
 
+        // print line if breakpoint
         if (breakpoint > beginning)
-        { // print line
+        {
             for (int place_in_line = beginning; place_in_line <= breakpoint; place_in_line++)
             {
                 printf("%c", s[place_in_line]);
             }
-            // printf("\n[%d] debug print line after breaking it linelength is %d breakpoint is %d\n", __LINE__, linelength, breakpoint);
-            printf("\n");           // line break
+
+            printf("\n");                 // line break
             beginning = (breakpoint + 1); // next line must begin 1 character after we broke
-
-            // printf("\n[%d] debug print line after changing counts linelength is %d breakpoint is %d\n", __LINE__, linelength, breakpoint);
         }
-        else
-        { // print line forcibly hyphenating it if the word is longer than 60. 
 
-            for (int place_in_line = beginning; place_in_line <= (beginning + 59); place_in_line++)
+        // use hyphen to break line if someone uses a 61+ character word as a troll
+        else
+        {
+
+            for (int place_in_line = beginning; place_in_line <= (beginning + (RIGHTMARGIN - 1)); place_in_line++)
             {
                 printf("%c", s[place_in_line]);
             }
             printf("-");  // print hyphen at end of line
             printf("\n"); // line break
 
-            beginning = (beginning + 60); // get ready for next line to begin where you broke.
-
-            
+            beginning = (beginning + RIGHTMARGIN); // get ready for next line to begin where you broke.
         }
     }
-    if ((linelength - breakpoint) < 60)
-    { // print last line after splitting
-        // printf("\n[%d] debug last line before print beginning is %d linelength is %d\n", __LINE__, beginning, linelength);
+
+    // print last line after splitting is done
+    if ((linelength - breakpoint) < RIGHTMARGIN)
+    {
 
         for (int place_in_line = beginning; place_in_line <= (beginning + linelength); place_in_line++)
         {
             printf("%c", s[place_in_line]);
         }
-        // printf("\n[%d] debug last line after splitting should be here, linelength is %d breakpoint is %d\n", __LINE__, linelength, breakpoint);
     }
 }
-
