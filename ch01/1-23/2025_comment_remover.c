@@ -2,19 +2,21 @@
 #define IN 1
 #define OUT 0
 
+// THESE MUST BE GLOBAL VARIABLES SO FUNCTION CAN SEE THEM
+// Making global variables to keep things cleaner
+
+// keep track of comment status
+int charliteral = OUT;
+int stringliteral = OUT;
+int singlelinecomment = OUT;
+int multilinecomment = OUT;
+
+// record characters
+int currentchar = 0;
+int prevchar = 0;
+
 void main()
 {
-
-    // keep track of comment status
-
-    int charliteral = OUT;
-    int stringliteral = OUT;
-    int singlelinecomment = OUT;
-    int multilinecomment = OUT;
-
-    // record characters (THESE MUST BE GLOBAL VARIABLES LATER SO FUNCTION CAN SEE THEM)
-    int currentchar = 0;
-    int prevchar = 0;
 }
 
 /* how to make this program
@@ -34,15 +36,17 @@ void main()
 - prevchar
 */
 
-// ### functions needed
+// # functions needed
 
-// #### check if in a single line comment
+// ## IMPORTANT: THESE NEED CURRENTCHAR, PREVCHAR, STRINGLITERAL, CHARLITERAL, SINGLELINECOMMENT, MULTILINECOMMENT TO BE GLOBAL VARIABLES
 
-int checksinglelinecomment(int prevchar, int currentchar, int singlelinecomment)
+// ### check if in a single line comment
+
+int checksinglelinecomment()
 {
     // If we have // , we aren't in string literal, or char literal, and no escape character has fucked with us, in single line comment
 
-    if ((currentchar == '/') && (prevchar == '/') && (prevchar - 1 != '\\') && (stringliteral == OUT) && (charliteral == OUT))
+    if ((currentchar == '/') && (prevchar == '/') && (prevchar - 1 != '\\') && (stringliteral == OUT) && (charliteral == OUT) && (multilinecomment == OUT))
     {
         -singlelinecomment = IN;
     }
@@ -71,8 +75,17 @@ int checksinglelinecomment(int prevchar, int currentchar, int singlelinecomment)
     return singlelinecomment;
 }
 
-/*
-#### check if in double line comment
+// ### check if in double line comment
+
+int checkdoublelinecomment()
+{
+    if ((currentchar == '*') && (prevchar == '/') && (prevchar - 1 != '\\') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
+    {
+        doublelinecomment = 'IN';
+
+        else if (doublelinecomment == 'IN')
+    }
+}
 
 - if (currentchar == *) && (prevchar ==
 
