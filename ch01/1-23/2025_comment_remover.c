@@ -1,6 +1,7 @@
 #include <stdio.h>
 #define IN 1
 #define OUT 0
+#define MAXFILENAME 100
 
 // THESE MUST BE GLOBAL VARIABLES SO FUNCTION CAN SEE THEM
 // Making global variables to keep things cleaner
@@ -40,15 +41,17 @@ void main()
 
 // ## IMPORTANT: THESE NEED CURRENTCHAR, PREVCHAR, STRINGLITERAL, CHARLITERAL, SINGLELINECOMMENT, MULTILINECOMMENT TO BE GLOBAL VARIABLES
 
+// ## One function that runs all functions below. Functions below check if we are in a string literal, char literal, single line comment, or multiline comment.
+
 // ### check if in a single line comment
 
 int checksinglelinecomment()
 {
     // If we have // , we aren't in string literal, or char literal, and no escape character has fucked with us, in single line comment
 
-    if ((currentchar == '/') && (prevchar == '/') && (prevchar - 1 != '\\') && (stringliteral == OUT) && (charliteral == OUT) && (multilinecomment == OUT))
+    if ((currentchar == '/') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (multilinecomment == OUT))
     {
-        -singlelinecomment = IN;
+        singlelinecomment = IN;
     }
 
     /*
@@ -77,41 +80,109 @@ int checksinglelinecomment()
 
 // ### check if in double line comment
 
-int checkdoublelinecomment()
+int checkmultilinecomment()
 {
-    if ((currentchar == '*') && (prevchar == '/') && (prevchar - 1 != '\\') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
+    if ((currentchar == '*') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
     {
-        doublelinecomment = 'IN';
-
-        else if (doublelinecomment == 'IN')
+        multilinecomment = 'IN';
     }
+
+    /*Once inside a multi-line comment, check for end of multiline comment*/
+    else if ((multilinecomment == 'IN') && (currentchar == '/') && (prevchar == '*'))
+    {
+        multilinecomment = 'OUT';
+    }
+    else
+    {
+        multilinecomment = multilinecomment;
+    }
+    return multilinecomment;
 }
 
-- if (currentchar == *) && (prevchar ==
+// #### check if in char literal
 
-#### check if in single line comment
+int checkcharliteral()
+{
+    if ((currentchar == '\'') && (prevchar != '\\') && (charliteral == OUT))
+    {
+        charliteral = IN;
+    }
+    else if ((currentchar == '\'') && (prevchar != '\\') && (charliteral == IN))
+    {
+        charliteral = OUT;
+    }
+    else
+    {
+        charliteral = charliteral;
+    }
+    return charliteral;
+}
 
-#### check if out of single line comment
+// #### check if in string literal
 
-#### check if in char literal
+int checkstringliteral()
+{
+    if ((currentchar == '\'') && (prevchar != '\\') && (stringliteral == OUT))
+    {
+        stringliteral = IN;
+    }
+    else if ((currentchar == '\'') && (prevchar != '\\') && (stringliteral == IN))
+    {
+        stringliteral = OUT;
+    }
+    else
+    {
+        stringliteral = stringliteral;
+    }
+    return stringliteral;
+}
 
-#### check if in string literal
+// open a c file to remove comments from
 
-- doesn't count if in single or multi line comment
+FILE *INPUT()
+{
+    char filename[MAXFILENAME + 1];
+    int n = 0;
 
+    printf("\nenter a filename to remove comments from below!\n\n");
+    while ((n < MAXFILENAME) && (filename[n] = getc(stdin)) != EOF)
+    {
+        if (filename[n] != '\n')
+        {
+            n++;
+        }
+        else
+        {
+            filename[n] == '\0';
+            break;
+        }
+    }
 
-### Logic for comments ###
+    FILE *file_ptr;
 
-#### If in a double line comment:
+    file_ptr = fopen(filename, "r");
+    return file_ptr;
+}
 
-- don't move forward
-- check for end of comment
+/*
 
+1. program needs to open a file
 
-#### If in single line comment
+2. program needs to have 2D array, input[LINE][COLUMN], output[LINE][COLUMN]
 
-- don't move forward
-- check for newline
+3. needs for loop that iterates through program input. y is line, x is column
+
+4. needs to know MAXLINE and MAXCOLUMN. needs to count this.
+
+5. y =
+
+6. when singleline comment ends
+    - `\n` must be placed
+    - `\0` must be placed after
+    - LINE must iterate.
+
+4
+
 
 
 */
