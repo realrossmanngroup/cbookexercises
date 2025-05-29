@@ -253,7 +253,14 @@ void main()
                 if (oldcolumn > 0) // only copy over if we are not trying to start before beginning of line
                 {
                     //DEBUG
-                    output[newline - 1][newcolumn - 1] = input[oldline - 1][oldcolumn - 1];
+printf("\nBEFORE COPY:\n");
+printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn - 1,input[oldline][oldcolumn - 1], newline, newcolumn -1 , output[newline][newcolumn - 1 ]);
+printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn,input[oldline][oldcolumn], newline, newcolumn, output[newline][newcolumn]);
+                    output[newline][newcolumn - 1] = input[oldline][oldcolumn - 1];
+printf("\nAFTER COPY:\n");
+printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn - 1,input[oldline][oldcolumn - 1], newline, newcolumn -1 , output[newline][newcolumn - 1 ]);
+printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn,input[oldline][oldcolumn], newline, newcolumn, output[newline][newcolumn]);
+
                 }
                 else
                 {
