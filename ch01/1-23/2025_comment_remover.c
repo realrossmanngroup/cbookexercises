@@ -2,9 +2,20 @@
 #define IN 1
 #define OUT 0
 #define MAXFILENAME 100
+#define MAXLINES 1000
+#define MAXCOLUMNS 1000
+#define YES 1
+#define NO 0
 
 // THESE MUST BE GLOBAL VARIABLES SO FUNCTION CAN SEE THEM
-// Making global variables to keep things cleaner
+
+// record input file and output file
+
+char input[MAXLINES][MAXCOLUMNS];
+char output[MAXLINES][MAXCOLUMNS];
+
+int MAXLINECOUNT = 0;
+int MAXLINELENGTH = 0;
 
 // keep track of comment status
 int charliteral = OUT;
@@ -16,10 +27,25 @@ int multilinecomment = OUT;
 int currentchar = 0;
 int prevchar = 0;
 
+// function declarations
+
+int loadprogram();
+int checkcharliteral();
+int checkstringliteral();
+int checksinglelinecomment();
+int checkmultilinecomment();
+
 void main()
 {
-}
+    // how  many lines is the input?
+    int linecount = 0;
 
+    linecount = loadprogram();
+    for (int x = 1; x <= linecount; x++)
+    {
+        printf("%s", input[x]);
+    }
+}
 /* how to make this program
 
 ### variables needed
@@ -84,13 +110,13 @@ int checkmultilinecomment()
 {
     if ((currentchar == '*') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
     {
-        multilinecomment = 'IN';
+        multilinecomment = IN;
     }
 
     /*Once inside a multi-line comment, check for end of multiline comment*/
-    else if ((multilinecomment == 'IN') && (currentchar == '/') && (prevchar == '*'))
+    else if ((multilinecomment == IN) && (currentchar == '/') && (prevchar == '*'))
     {
-        multilinecomment = 'OUT';
+        multilinecomment = OUT;
     }
     else
     {
@@ -139,38 +165,84 @@ int checkstringliteral()
 
 // open a c file to remove comments from
 
-FILE *INPUT()
+int loadprogram()
 {
-    char filename[MAXFILENAME + 1];
-    int n = 0;
+    int ISFILEOPEN = NO;
+    int LINE = 0;
+    char filename[MAXFILENAME + 1]; // where filename will be stored
+    FILE *program;
 
-    printf("\nenter a filename to remove comments from below!\n\n");
-    while ((n < MAXFILENAME) && (filename[n] = getc(stdin)) != EOF)
+    while (ISFILEOPEN == NO)
+
     {
-        if (filename[n] != '\n')
+        printf("\nenter a filename to remove comments from below!\n\n");
+        scanf("%100s", filename);
+
+        program = fopen(filename, "r");
+
+        if (program != NULL)
         {
-            n++;
+            printf("\nprogram opened successfully!\n");
+            ISFILEOPEN = YES;
+            break;
         }
         else
         {
-            filename[n] == '\0';
+            ISFILEOPEN == NO;
+            printf("\nprogram failed to open, file is null! Try again\n");
+        }
+    }
+    while (fgets(input[LINE], (MAXCOLUMNS - 3), program) != NULL)
+    {
+        if (LINE < MAXLINES - 2)
+        {
+            LINE++;
+        }
+        else
+        {
             break;
         }
     }
+    return LINE;
+}
 
-    FILE *file_ptr;
+void main()
+{
 
-    file_ptr = fopen(filename, "r");
-    return file_ptr;
+    int line = 0;
+    int column = 0;
+
+    loadprogram();
+
+    for (line = 0; line >= MAXLINELENGTH; line++)
+    {
+        for (column = 0; column != '\0'; column++)
+        {
+
+            /* Here we are going through each character. 
+            what do we need to do?
+            
+            1. */
+        }
+    }
 }
 
 /*
 
 1. program needs to open a file
 
+```
+loadprogram();
+
+```
+
 2. program needs to have 2D array, input[LINE][COLUMN], output[LINE][COLUMN]
 
+DONE
+
 3. needs for loop that iterates through program input. y is line, x is column
+
+for()
 
 4. needs to know MAXLINE and MAXCOLUMN. needs to count this.
 
