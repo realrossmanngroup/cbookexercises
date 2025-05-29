@@ -30,22 +30,11 @@ int prevchar = 0;
 // function declarations
 
 int loadprogram();
-int checkcharliteral();
-int checkstringliteral();
-int checksinglelinecomment();
-int checkmultilinecomment();
+int checkcharliteral(char currentchar, char prevchar);
+int checkstringliteral(char currentchar, char prevchar);
+int checksinglelinecomment(char currentchar, char prevchar);
+int checkmultilinecomment(char currentchar, char prevchar);
 
-void main()
-{
-    // how  many lines is the input?
-    int linecount = 0;
-
-    linecount = loadprogram();
-    for (int x = 1; x <= linecount; x++)
-    {
-        printf("%s", input[x]);
-    }
-}
 /* how to make this program
 
 ### variables needed
@@ -71,7 +60,24 @@ void main()
 
 // ### check if in a single line comment
 
-int checksinglelinecomment()
+int commentstatus(char currentchar, char prevchar)
+{
+    checkcharliteral(currentchar, prevchar);
+    checkstringliteral(currentchar, prevchar);
+    checksinglelinecomment(currentchar, prevchar);
+    checkmultilinecomment(currentchar, prevchar);
+
+    if ((singlelinecomment == IN) || (multilinecomment == IN))
+    {
+        return IN;
+    }
+    else
+    {
+        return OUT;
+    }
+}
+
+int checksinglelinecomment(char currentchar, char prevchar)
 {
     // If we have // , we aren't in string literal, or char literal, and no escape character has fucked with us, in single line comment
 
@@ -106,7 +112,7 @@ int checksinglelinecomment()
 
 // ### check if in double line comment
 
-int checkmultilinecomment()
+int checkmultilinecomment(char currentchar, char prevchar)
 {
     if ((currentchar == '*') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
     {
@@ -127,7 +133,7 @@ int checkmultilinecomment()
 
 // #### check if in char literal
 
-int checkcharliteral()
+int checkcharliteral(char currentchar, char prevchar)
 {
     if ((currentchar == '\'') && (prevchar != '\\') && (charliteral == OUT))
     {
@@ -146,13 +152,13 @@ int checkcharliteral()
 
 // #### check if in string literal
 
-int checkstringliteral()
+int checkstringliteral(char currentchar, char prevchar)
 {
-    if ((currentchar == '\'') && (prevchar != '\\') && (stringliteral == OUT))
+    if ((currentchar == '\"') && (prevchar != '\\') && (stringliteral == OUT))
     {
         stringliteral = IN;
     }
-    else if ((currentchar == '\'') && (prevchar != '\\') && (stringliteral == IN))
+    else if ((currentchar == '\"') && (prevchar != '\\') && (stringliteral == IN))
     {
         stringliteral = OUT;
     }
@@ -188,12 +194,15 @@ int loadprogram()
         }
         else
         {
-            ISFILEOPEN == NO;
+            ISFILEOPEN = NO;
             printf("\nprogram failed to open, file is null! Try again\n");
         }
     }
+    LINE = 0;
+
     while (fgets(input[LINE], (MAXCOLUMNS - 3), program) != NULL)
     {
+        printf("Line %d: %s", LINE, input[LINE]);
         if (LINE < MAXLINES - 2)
         {
             LINE++;
@@ -207,28 +216,99 @@ int loadprogram()
 }
 
 void main()
+
 {
 
-    int line = 0;
-    int column = 0;
+    int charliteral = OUT;
+    int stringliteral = OUT;
+    int singlelinecomment = OUT;
+    int multilinecomment = OUT;
 
-    loadprogram();
+    int oldline = 0;
+    int oldcolumn = 0;
+    int newline = 0;
+    int newcolumn = 0;
 
-    for (line = 0; line >= MAXLINELENGTH; line++)
+    MAXLINECOUNT = loadprogram();
+
+    // printing input
+
+    printf("\n\nHere is the input file:\n\n\n");
+
+    for (int y = 0; y <= MAXLINECOUNT; y++)
     {
-        for (column = 0; column != '\0'; column++)
+        for (int x = 0; input[y][x] != '\0'; x++)
         {
+            printf("%c", input[y][x]);
+        }
+        printf("\n");
+    }
 
-            /* Here we are going through each character. 
-            what do we need to do?
-            
-            1. */
+    for (oldline = 0, newline = 0; oldline <= MAXLINELENGTH; oldline++, newline++)
+    {
+        for (oldcolumn = 0, newcolumn = 0; input[oldline][oldcolumn] != '\0'; oldcolumn++, newcolumn++)
+        { // if we're out of a comment, copy over.
+            if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == OUT)
+            {
+                if (oldcolumn > 0) // only copy over if we are not trying to start before beginning of line
+                {
+                    //DEBUG
+                    output[newline - 1][newcolumn - 1] = input[oldline - 1][oldcolumn - 1];
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            else if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == IN)
+            {
+                if (singlelinecomment == IN)
+                {
+                    newline--;
+                    singlelinecomment = OUT;
+                    break;
+                }
+                else
+                {
+                    newcolumn--; // don't let new move forward as long as we're in a multiline comment.
+                }
+            }
         }
     }
+
+    // print output
+
+    printf("\n\n\nnow here is the uncommented version!\n\n\n");
+
+    for (int y = 0; y <= MAXLINECOUNT; y++)
+    {
+        for (int x = 0; output[y][x] != '\0'; x++)
+        {
+            printf("%c", output[y][x]);
+        }
+        printf("\n");
+    }
+    printf("\n\n\nand there you have it, the program is comment free!\n\n\n");
 }
+
+/* what needs to happen:
+
+1. when we hit a singleline comment, move to newline & character 1 for both INPUT and OUTPUT.
+2. add null terminator at point of new comment.
+3. when we hit a DOUBLELINE comment, stop counting column in output, keep counting input.
+4. when end of line is hit in DOUBLELINE comment, output column count increments again as normal(aka normal copying)
+5. don't do any bullshit where line in INPUT moves along with line in OUTPUT.
+
+6. once we enter a comment, such as /*,
+copy the line from input[][]  to output [][]. easy
 
 /*
 
+
+
+
+
+/*
 1. program needs to open a file
 
 ```
@@ -249,9 +329,9 @@ for()
 5. y =
 
 6. when singleline comment ends
-    - `\n` must be placed
-    - `\0` must be placed after
-    - LINE must iterate.
+- `\n` must be placed
+- `\0` must be placed after
+- LINE must iterate.
 
 4
 
