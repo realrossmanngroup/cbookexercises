@@ -1,3 +1,10 @@
+/* This is garbage but much better than my first
+program and was done with no help besides googling
+how to copy a file into a C program since this wasn't
+in the book yet. There is a janky section I noted
+below that I am not proud of that I'd like to come
+back to later when I feel I've gotten good enough*/
+
 #include <stdio.h>
 #define IN 1
 #define OUT 0
@@ -114,7 +121,7 @@ int checksinglelinecomment(char currentchar, char prevchar)
 
 int checkmultilinecomment(char currentchar, char prevchar)
 {
-    
+
     if ((currentchar == '*') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
     {
         multilinecomment = IN;
@@ -236,38 +243,46 @@ void main()
     {
         for (oldcolumn = 0, newcolumn = 0; input[oldline][oldcolumn] != '\0'; oldcolumn++, newcolumn++)
         { // if we're out of a comment, copy over.
-            if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == OUT)
+            if (commentstatus(input[oldline][oldcolumn + 1], input[oldline][oldcolumn]) == OUT)
             {
-
-                // DEBUG
-                printf("\nBEFORE COPY:\n");
-                printf("input[%d][%d] = %c\n", oldline, oldcolumn - 1, input[oldline][oldcolumn - 1]);
-                printf("input[%d][%d] = %c\n", oldline, oldcolumn, input[oldline][oldcolumn]);
-                printf("output[%d][%d] = %c\n", newline, newcolumn - 1, output[newline][newcolumn - 1]);
-                printf("output[%d][%d] = %c\n\n", newline, newcolumn, output[newline][newcolumn]);
 
                 output[newline][newcolumn] = input[oldline][oldcolumn];
-
-                printf("\nAFTER COPY:\n");
-                printf("input[%d][%d] = %c\n", oldline, oldcolumn - 1, input[oldline][oldcolumn - 1]);
-                printf("input[%d][%d] = %c\n", oldline, oldcolumn, input[oldline][oldcolumn]);
-                printf("output[%d][%d] = %c\n", newline, newcolumn - 1, output[newline][newcolumn - 1]);
-                printf("output[%d][%d] = %c\n\n", newline, newcolumn, output[newline][newcolumn]);
             }
 
-            else if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == IN)
+            else if (commentstatus(input[oldline][oldcolumn + 1], input[oldline][oldcolumn]) == IN)
             {
                 printf("\n\nin a comment: singlelinecomment = %d, multilinecomment = %d, commentstatus =  %d \n\n", singlelinecomment, multilinecomment, commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]));
+
                 if (singlelinecomment == IN)
                 {
-                    printf("\n\nSINGLE LINE COMMENT FOUND HERE!\n\n");
                     output[newline][newcolumn - 1] = '\n';
                     singlelinecomment = OUT;
                     break;
                 }
-                else
+                else if (multilinecomment == IN)
                 {
                     newcolumn--; // don't let new move forward as long as we're in a multiline comment.
+
+                    /*THIS IS JANK :(
+                    if the program gets to the end of a multiline comment, it copies over the
+                    end-of-multiline-comment symbol, because it checks whether it is at the end
+                    of a comment AHEAD of time. I did this so it wouldn't copy over the `/*` in
+                    the beginning, but this backfired at the end. I could've made the program so
+                    it goes back and erases what it copied but that seems dangerous so I thought
+                    this was safer. I am also coming back to something I haven't worked on for 
+                    3 months that I shouldn't have left off. I want to come back to this and 
+                    find a less janky solution later, I'm not proud fo this :( */
+                    
+                    /* If we are in a multiline comment, it checks to see if the next two characters are
+                    leaving the multiline comment. If they are, it sets us out of the multiline comment
+                    and skips ahead two in the position we are reading from input so that the 
+                    copying logic above doesn't copy the asterisk & foreward slash of the 
+                    end of the comment */
+                    if (((charliteral == OUT) && (stringliteral == OUT)) && (multilinecomment == IN) && ((input[oldline][oldcolumn + 2] == '/') && (input[oldline][oldcolumn + 1] == '*')))
+                    {
+                        multilinecomment = OUT;
+                        oldcolumn = oldcolumn + 2;
+                    }
                 }
             }
         }
