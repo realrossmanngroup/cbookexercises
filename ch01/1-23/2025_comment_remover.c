@@ -62,10 +62,10 @@ int checkmultilinecomment(char currentchar, char prevchar);
 
 int commentstatus(char currentchar, char prevchar)
 {
-    checkcharliteral(currentchar, prevchar);
-    checkstringliteral(currentchar, prevchar);
-    checksinglelinecomment(currentchar, prevchar);
-    checkmultilinecomment(currentchar, prevchar);
+    charliteral = checkcharliteral(currentchar, prevchar);
+    stringliteral = checkstringliteral(currentchar, prevchar);
+    singlelinecomment = checksinglelinecomment(currentchar, prevchar);
+    multilinecomment = checkmultilinecomment(currentchar, prevchar);
 
     if ((singlelinecomment == IN) || (multilinecomment == IN))
     {
@@ -114,6 +114,7 @@ int checksinglelinecomment(char currentchar, char prevchar)
 
 int checkmultilinecomment(char currentchar, char prevchar)
 {
+    
     if ((currentchar == '*') && (prevchar == '/') && (stringliteral == OUT) && (charliteral == OUT) && (singlelinecomment == OUT))
     {
         multilinecomment = IN;
@@ -199,7 +200,7 @@ int loadprogram()
         }
     }
     LINE = 0;
-
+    // print input program to confirm it loaded
     while (fgets(input[LINE], (MAXCOLUMNS - 3), program) != NULL)
     {
         printf("Line %d: %s", LINE, input[LINE]);
@@ -219,10 +220,10 @@ void main()
 
 {
 
-    int charliteral = OUT;
-    int stringliteral = OUT;
-    int singlelinecomment = OUT;
-    int multilinecomment = OUT;
+    charliteral = OUT;
+    stringliteral = OUT;
+    singlelinecomment = OUT;
+    multilinecomment = OUT;
 
     int oldline = 0;
     int oldcolumn = 0;
@@ -231,47 +232,36 @@ void main()
 
     MAXLINECOUNT = loadprogram();
 
-    // printing input
-
-    printf("\n\nHere is the input file:\n\n\n");
-
-    for (int y = 0; y <= MAXLINECOUNT; y++)
-    {
-        for (int x = 0; input[y][x] != '\0'; x++)
-        {
-            printf("%c", input[y][x]);
-        }
-        printf("\n");
-    }
-
-    for (oldline = 0, newline = 0; oldline <= MAXLINELENGTH; oldline++, newline++)
+    for (oldline = 0, newline = 0; oldline <= MAXLINECOUNT; oldline++, newline++)
     {
         for (oldcolumn = 0, newcolumn = 0; input[oldline][oldcolumn] != '\0'; oldcolumn++, newcolumn++)
         { // if we're out of a comment, copy over.
             if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == OUT)
             {
-                if (oldcolumn > 0) // only copy over if we are not trying to start before beginning of line
-                {
-                    //DEBUG
-printf("\nBEFORE COPY:\n");
-printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn - 1,input[oldline][oldcolumn - 1], newline, newcolumn -1 , output[newline][newcolumn - 1 ]);
-printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn,input[oldline][oldcolumn], newline, newcolumn, output[newline][newcolumn]);
-                    output[newline][newcolumn - 1] = input[oldline][oldcolumn - 1];
-printf("\nAFTER COPY:\n");
-printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn - 1,input[oldline][oldcolumn - 1], newline, newcolumn -1 , output[newline][newcolumn - 1 ]);
-printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn,input[oldline][oldcolumn], newline, newcolumn, output[newline][newcolumn]);
 
-                }
-                else
-                {
-                    continue;
-                }
+                // DEBUG
+                printf("\nBEFORE COPY:\n");
+                printf("input[%d][%d] = %c\n", oldline, oldcolumn - 1, input[oldline][oldcolumn - 1]);
+                printf("input[%d][%d] = %c\n", oldline, oldcolumn, input[oldline][oldcolumn]);
+                printf("output[%d][%d] = %c\n", newline, newcolumn - 1, output[newline][newcolumn - 1]);
+                printf("output[%d][%d] = %c\n\n", newline, newcolumn, output[newline][newcolumn]);
+
+                output[newline][newcolumn] = input[oldline][oldcolumn];
+
+                printf("\nAFTER COPY:\n");
+                printf("input[%d][%d] = %c\n", oldline, oldcolumn - 1, input[oldline][oldcolumn - 1]);
+                printf("input[%d][%d] = %c\n", oldline, oldcolumn, input[oldline][oldcolumn]);
+                printf("output[%d][%d] = %c\n", newline, newcolumn - 1, output[newline][newcolumn - 1]);
+                printf("output[%d][%d] = %c\n\n", newline, newcolumn, output[newline][newcolumn]);
             }
+
             else if (commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]) == IN)
             {
+                printf("\n\nin a comment: singlelinecomment = %d, multilinecomment = %d, commentstatus =  %d \n\n", singlelinecomment, multilinecomment, commentstatus(input[oldline][oldcolumn], input[oldline][oldcolumn - 1]));
                 if (singlelinecomment == IN)
                 {
-                    newline--;
+                    printf("\n\nSINGLE LINE COMMENT FOUND HERE!\n\n");
+                    output[newline][newcolumn - 1] = '\n';
                     singlelinecomment = OUT;
                     break;
                 }
@@ -293,7 +283,6 @@ printf("input[%d][%d] = %c \n output[%d][%d] = %c\n\n",oldline,oldcolumn,input[o
         {
             printf("%c", output[y][x]);
         }
-        printf("\n");
     }
     printf("\n\n\nand there you have it, the program is comment free!\n\n\n");
 }
